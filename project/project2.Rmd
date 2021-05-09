@@ -1,0 +1,312 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "SDS348"
+date: ''
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+class_diag<-function(probs,truth){
+  
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+```
+
+# Modeling
+
+- **0. (5 pts)** Introduce your dataset and each of your variables (or just your main variables if you have lots) in a paragraph. What are they measuring? How many observations?
+
+```{R}
+library(readxl)
+Affairs <- read_excel("Affairs.xlsx")
+#View(Affairs)
+```
+***Hello! My dataset is a cross-section data of married people from a survey conducted by Psychology Today in 1969. It was about extramarital affairs, but the amount of factos allows for lots of correlations to be tested of married people. It contains nine variable: affairs, gender, age,	years married,	children,	religiousness, education,	occupation, and	rating of their life. The survey asked 601 participants. Only 2 variables are numeric: religiousness and rating. The rest are categorical, despite it being in number form they are in discrete groups. 
+
+The variables break down like this: 
+
+affairs = How often engaged in extramarital sexual intercourse during the past year?
+
+gender= male or female
+
+age = numeric variable coding age in years: 17.5 = under 20, 22 = 20–24, 27 = 25–29, 32 = 30–34, 37 = 35–39, 42 = 40–44, 47 = 45–49, 52 = 50–54, 57 = 55 or over.
+
+yearsmarried = numeric variable coding number of years married: 0.125 = 3 months or less, 0.417 = 4–6 months, 0.75 = 6 months–1 year, 1.5 = 1–2 years, 4 = 3–5 years, 7 = 6–8 years, 10 = 9–11 years, 15 = 12 or more years.
+
+children= do you have children? yes or no.
+
+religiousness = numeric variable coding religiousness: 1 = anti, 2 = not at all, 3 = slightly, 4 = somewhat, 5 = very.
+
+education = numeric variable coding level of education: 9 = grade school, 12 = high school graduate, 14 = some college, 16 = college graduate, 17 = some graduate work, 18 = master's degree, 20 = Ph.D., M.D., or other advanced degree.
+
+occupation = numeric variable coding occupation according to Hollingshead classification (reverse numbering).
+
+rating = numeric variable coding self rating of marriage: 1 = very unhappy, 2 = somewhat unhappy, 3 = average, 4 = happier than average, 5 = very happy.***
+
+
+
+
+
+- **1. (15 pts)** 
+Perform a MANOVA testing whether any of your numeric variables (or a subset of them, if including them all is unreasonable or doesn't make sense) show a mean difference across levels of one of your categorical variables (3). 
+
+If they do, perform univariate ANOVAs to find response(s) showing a mean difference across groups (3), and perform post-hoc t tests to find which groups differ (3).
+
+Discuss the number of tests you have performed, calculate the probability of at least one type I error (if unadjusted), and adjust the significance level accordingly (bonferroni correction) before discussing significant differences (3). 
+
+Briefly discuss some of the MANOVA assumptions and whether or not they are likely to have been met here (no need for anything too in-depth) (2).
+
+```{R}
+#manova
+manAffairs <- manova(cbind(religiousness,rating)~gender, data=Affairs)
+summary(manAffairs)
+#univariate Anova and post-hoc t-test
+summary.aov(manAffairs)
+pairwise.t.test(Affairs$religiousness,Affairs$gender, p.adj="none")
+pairwise.t.test(Affairs$rating,Affairs$gender, p.adj="none")
+
+#tests, probability of error
+1-(0.95^5)
+0.05/5
+pairwise.t.test(Affairs$religiousness,Affairs$gender, p.adj="none")$p.value<0.05/5
+pairwise.t.test(Affairs$rating,Affairs$gender, p.adj="none")$p.value<0.05/5
+```
+
+***I did a manova to test the mean difference in religiousness and rating of quality of life based on identified gender. THe results showed there was no significant differences in religiousness or rating of quality of life depending on gender (p=0.9652). I still ran a univariate ANOVA test to find responses showing a mean difference across the groups. I found that religiousness in gender had a p value of 0.851, making it insignificant. I also found that rating in gender had a p value of 0.854, also making it insignificant. I then performed post-hoc t-tests to show which groups differ by gender. This required the Bonferroni correction for the number of tests performed (which was 5, 1 MANOVA, 2 univariate ANOVAs and 2 post-hoc) because the probability of making a Type I error was 1-(0.95)^5, or 0.2262191. After adjustment (0.05/5= 0.1) to the significance level it's proven none of the tests are significant. The dataset meets most of the assumptions for the MANOVA test like random samples, no extreme outliers, independent observations. but there may not be a normal distribution,equal variance, or even a linear relationship between the religiousness and rating of quality of life by gender.***
+
+
+- **2. (10 pts)** 
+Perform some kind of randomization test on your data (that makes sense). The statistic can be anything you want (mean difference, correlation, F-statistic/ANOVA, chi-squared), etc. State null and alternative hypotheses, perform the test, and interpret the results (7). 
+Create a plot visualizing the null distribution and the test statistic (3).
+
+```{R}
+Affairs%>%group_by(gender)%>%summarize(means=mean(rating))%>%summarize('mean_diff'= diff(means)) #-0.01660562
+
+rand_dist<- vector()
+for(i in 1:5000){
+  new<- data.frame(rating=sample(Affairs$rating), gender=Affairs$gender)
+  rand_dist[i] <- mean(new[new$gender == "male",]$rating)-mean(new[new$gender == "female",]$rating)
+}
+
+mean(rand_dist < -0.01660562 | rand_dist > 0.01660562)
+
+{hist(rand_dist,main ="",ylab=""); abline(v = c(-0.01660562, 0.01660562), col="red")}
+```
+***I used a mean difference randomization test. The null hypothesis is the rating of quality of life will be the same between females and males. THe alternative hypothesis is that the rating of quality of life differs between females and males. The tests gave a p-value greater than 0.05 (p= 0.8566), meaning the null hypothesis is not rejected, meaning there is not a significant difference in the rating of quality of life between females and males.***
+
+- **3. (40 pts)** Build a linear regression model predicting one of your response variables from at least 2 other variables, including their interaction. Mean-center any numeric variables involved in the interaction.
+
+    - Interpret the coefficient estimates (do not discuss significance) (10)
+    - Plot the regression using `ggplot()` using geom_smooth(method="lm"). If your interaction is numeric by numeric, refer to code in the slides to make the plot or check out the `interactions` package, which makes this easier. If you have 3 or more predictors, just chose two of them to plot for convenience. (10)
+    - What proportion of the variation in the outcome does your model explain? (4)
+    - Check assumptions of linearity, normality, and homoskedasticity either graphically or using a hypothesis test (5)
+    - Regardless, recompute regression results with robust standard errors via `coeftest(..., vcov=vcovHC(...))`. Discuss significance of results, including any changes from before/after robust SEs if applicable. (10)
+
+```{R}
+Affairs<-Affairs%>%mutate(meanRating=rating-mean(rating),meanReligousness=religiousness-mean(religiousness))
+
+f2 <- lm(meanRating ~ meanReligousness*gender, data=Affairs); summary(f2)
+
+ggplot(Affairs, aes(x=meanReligousness, y=meanRating,group=gender))+geom_point(aes(color=gender))+
+  geom_smooth(method="lm",aes(color=gender))+xlab("Mean-Centered Religiousness")+ylab("Mean-Centered Quality of Life")
+
+f2residuals<-f2$residuals
+f2fit<-f2$fitted.values
+ggplot()+geom_point(aes(f2fit,f2residuals))+geom_hline(yintercept=0, color='red')
+ggplot()+geom_histogram(aes(f2residuals), bins=20)
+ggplot()+geom_qq(aes(sample=f2residuals))+geom_qq_line(aes(sample=f2residuals))
+shapiro.test(f2residuals)
+
+library(sandwich)
+library(lmtest)
+bptest(f2)
+summary(f2)$coef%>%round(4)
+coeftest(f2, vcov = vcovHC(f2))
+```
+***THe first thing to note here is that my numeric variables of religiousness and rating of quality of life were discrete, it was a number on a scale from 1-5, which causes the graphs to show up a little different. I used a linear regression model to predict gender relative to the rating of quality of life and religiousness. The coefficient estimates show that for women the average rating of quality of life is 0.0078 when religiousness is zero. For every one unit increase in religiousness, rating of quality of life goes down by 0.01224 for females. Also, males with a religiousness rating of zero have a predicted rating of quality of life that is -0.0170416. The slope of religiousness on rating of quality of life is 0.06972 higher than females. When checking assumptions for homoskedasticity, the model does not display linearity or homoskedasticity via graphically and using a hypothesis test, nor does it pass the normality assumption. Meaning the model is not satisfactory. Using robust standard errors, the relationship tested did not change in values,  but the p-value did change to p>0.05.***
+
+
+***From the adjusted R-squared of the linear model created, we see that 38.73% of the total variation this model can explain. There is a weak linearity according to the model, the residual plot shows the data does not meet the assumption of homoskedasticity, despite being fitted. This is also due to the fact that these are discrete numeric variables, but even taking that into account it does not meet the assumption. Since the p value was 0.9416 (through the Breusch-Pagan test), the data was not significant. There was also a lack of normal distribution on the histogram, more of an upward trend between the variables, and the Q-Q plot not following the trend line for each discrete variable. This was also verified with the Shapiro-Wilk test.***
+
+
+- **4. (5 pts)** Rerun same regression model (with the interaction), but this time compute bootstrapped standard errors (either by resampling observations or residuals). Discuss any changes you observe in SEs and p-values using these SEs compared to the original SEs and the robust SEs)
+
+```{R}
+set.seed(348)
+  f2<-lm(meanRating ~ meanReligousness*gender, data=Affairs)
+  f2residuals<-f2$residuals
+  f2fit<-f2$fitted.values 
+  
+  r<-replicate(5000,{
+    r2<-sample(f2residuals,replace=TRUE)
+    Affairs$nRate<-f2fit+r2 
+    f2<-lm(nRate~meanReligousness*gender, data=Affairs)
+    coef(f2)
+})
+r%>%t%>%as.data.frame%>%summarize_all(sd)%>%pivot_longer(1:4,names_to = "Coefficient", values_to = "Bootstrapped SE")
+summary(f2)$coef%>%round(4)
+coeftest(f2, vcov = vcovHC(f2))
+```
+***There was no significant changes in bootstrapped standard errors or p- values compared to the original SEs or the robust SEs. BUT there was a very small difference of the bootstrapped SEs difference with the robust SEs being a smidge larger than the bootstrapped SEs difference with the original SEs. But the difference is so small, it has no evidence of meaning anything significant. DUe to these minuscule changes we can assume the p-values in either comparison do not change significantly either.***
+
+
+- **5. (30 pts)** Fit a logistic regression model predicting a binary variable (if you don't have one, make/get one) from at least two explanatory variables (interaction not necessary). 
+
+    - Interpret coefficient estimates in context (10)
+    - Report a confusion matrix for your logistic regression (5)
+    - Compute and discuss the Accuracy, Sensitivity (TPR), Specificity (TNR), Precision (PPV), and AUC of your model (5)
+    - Using ggplot, make a density plot of the log-odds (logit) colored/grouped by your binary outcome variable (5)
+    - Generate an ROC curve (plot) and calculate AUC (either manually or with a package); interpret (5)
+
+```{R}
+data<-Affairs%>%mutate(y=ifelse(meanRating>0,0,1),outcome=ifelse(meanRating>0,0,1))
+limlog<-glm(y~meanReligousness+gender, data=data, family=binomial)
+coeftest(limlog)
+exp(coeftest(limlog))
+#Confusion matrix
+probs<-predict(limlog,type="response")
+table(predict=as.numeric(probs>.5),truth=data$y)%>%addmargins
+
+data$prob <- predict(limlog,type="response")
+data$predicted <- ifelse(data$prob>.5,"Less than 3 Rating","3 or More Rating")
+data$outcome<-factor(data$outcome,levels=c("0","1")) #rename
+levels(data$outcome) <- c("Less than 3 Rating", "3 or More Rating") #rename
+table(truth=data$outcome, prediction=data$predicted)%>%addmargins
+
+
+class_diag(data$prob,data$outcome)
+data$logit<-predict(limlog)
+#Density Plot
+ggplot(data,aes(logit, fill=outcome))+geom_density(alpha=.3)+geom_rug(aes(logit,color=outcome))+
+  geom_vline(xintercept=0,lty=2)+theme(legend.position=c(.125,.875))+xlab("logit (log-odds)")
+#ROC curve and AUC
+library(plotROC)
+ROCplot<-ggplot(data)+geom_roc(aes(d=outcome,m=prob), n.cuts=0)+geom_segment(aes(x=0,y=0,xend=1,yend=1),lty=2)+xlab("FPR")+ylab("TPR")
+ROCplot
+calc_auc(ROCplot)
+```
+
+***I used a logistic regression to predict the odds of a participant having a result of less than 3 of religiousness based on gender. Using a significance level of 0.05, none of the groups are of interest. It shows males have an coefficient estimate of -0.0885 of religiousness at the intercept. The intercept predicts the mens level of religiousness decrease with the increase of their rating of quality of life. This is quite interesting. THe odds of having less than a 3 on the religious survey as quality of life increases is 38%. When i created a confusion matrix, it showed the accuracy of the model predicting quality of life by religiousness scoring 29.11% (175/601). The ROC curve/ AUC calculation show a strong trend line and a AUC of 0.507 meaning it shows a strong predictor between religiousness and quality of life.***
+
+- **6. (25 pts)** Perform a logistic regression predicting the same binary response variable from *ALL* of the rest of your variables (the more, the better!) 
+
+    - Fit model, compute in-sample classification diagnostics (Accuracy, Sensitivity, Specificity, Precision, AUC), and interpret (5)
+    - Perform 10-fold (or repeated random sub-sampling) CV with the same model and report average out-of-sample classification diagnostics (Accuracy, Sensitivity, Specificity, Precision, and AUC); interpret AUC and compare with the in-sample metrics (10)
+    - Perform LASSO on the same model/variables. Choose lambda to give the simplest model whose accuracy is near that of the best (i.e., `lambda.1se`). Discuss which variables are retained. (5)
+    - Perform 10-fold CV using only the variables lasso selected: compare model's out-of-sample AUC to that of your logistic regressions above (5)
+
+```{R}
+dataf<-Affairs%>%mutate(y=ifelse(meanRating>0,0,1),outcomef=ifelse(meanRating>0,0,1))
+log<-glm(y~meanReligousness+gender+affairs+yearsmarried+children+education+occupation, data=dataf, family=binomial)
+
+coeftest(log)
+exp(coeftest(log))
+dataf$probf <- predict(log,type="response")
+dataf$predictedf <- ifelse(dataf$probf>.5,"Less than 3 Rating","3 or More Rating")
+dataf$outcomef<-factor(dataf$outcomef,levels=c("0","1"))
+levels(dataf$outcomef) <- c("Less than 3 Rating","3 or More Rating")
+table(truth=dataf$outcomef, prediction=dataf$predictedf)%>%addmargins
+class_diag(dataf$probf,dataf$outcomef)
+
+
+set.seed(348)
+k=10
+dat<-dataf[sample(nrow(dataf)),] 
+folds<-cut(seq(1:nrow(dataf)),breaks=k,labels=F)
+diags<-NULL
+for(i in 1:k){
+  train<-dat[folds!=i,] 
+  test<-dat[folds==i,]
+  
+  truth<-test$y
+  
+  fitf<-glm(y~rating+gender+affairs+yearsmarried+children+education+occupation,data=train,family="binomial")
+  
+  probs<-predict(fitf,newdata = test,type="response")
+  
+  diags<-rbind(diags,class_diag(probs,truth))
+}
+diags%>%summarize_all(mean)
+
+library(glmnet)
+set.seed(348)
+y<-as.matrix(dataf$y)
+x<-model.matrix(y~meanReligousness+gender+affairs+yearsmarried+children+education+occupation,data=dataf)[,-1]
+cv<-cv.glmnet(x,y)
+{plot(cv$glmnet.fit, "lambda", label=TRUE); abline(v = log(cv$lambda.1se)); abline(v = log(cv$lambda.min),lty=2)}
+cv<-cv.glmnet(x,y,family="binomial")
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+
+set.seed(348)
+k=10
+dat<-dataf[sample(nrow(dataf)),] 
+folds<-cut(seq(1:nrow(dataf)),breaks=k,labels=F)
+diags<-NULL
+for(i in 1:k){
+  train<-dat[folds!=i,] 
+  test<-dat[folds==i,]
+  
+  truth<-test$y
+  
+  fitf<-glm(y~rating,data=train,family="binomial")
+  
+  probs<-predict(fitf,newdata = test,type="response")
+  
+  diags<-rbind(diags,class_diag(probs,truth))
+}
+diags%>%summarize_all(mean)
+```
+***The accuracy, sens, spec, ppv, and auc respectively was 0.7321131,	0.1828571,	0.9577465,	0.64,	0.6587592. The model showed that increasing quality of life decreases religiousness in males. The accuracy, sens, spec, ppv, and auc all prove that the model is a good predictor of the data and is consistent. After performing the 10-fold CV, where the accuracy (1), sensitivity (1), specificity (1), precision (1), and AUC (1), shows the model is incredibly accurate in predicting, without correction. The LASSO had small coefficients but the most accurate lambda. The simple model also had a accuracy (1), sensitivity (1), specificity (1), precision (1), and AUC (1). Making it equal to the 10-fold model in their predictions. Overall the best models are the 10-fold and the simple, but they're all great predictor models! Also the only values retained after conducting the LASSO were affairs, years married, and education.***
+
+
+```{R eval=F}
+data(package = .packages(all.available = TRUE))
+```
+
+
+
+
+
+

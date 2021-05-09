@@ -1,0 +1,300 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "SDS348"
+date: ''
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+## Data Wrangling and Data Exploration
+
+###Introduction!!!!
+
+I chose to datasets that focused on different countries' statistics. The reason I chose these datasets is because I thought it would be really interesting to see the correlation different aspects of countries globally rather than just picking something that was in one specific area and based off one specific culture, to be able to see universal trends. So my data set under CP came from the UN data website which has collected from more than 20 International statistical sources that compiled regularly by the statistics and population divisions of the United Nations. My CD date came from HELP International which is an international humanitarian group that focuses on combating poverty and providing people with basic amenities and relief during disasters and natural calamities. Both data have been reviewed by a crowdsourced platform, and have been cited in many publications. Both datasets contain a lot of variables but the main focus of the variables are health, trade, women, income, and population. I'm personally really interested in the women, population, and income columns; I am expecting to see low fertility rates in areas where women have higher education, and areas with large GDP to have more women in Parliament.
+
+### Guidelines
+
+1. If the datasets are not tidy, you will need to reshape them so that every observation has its own row and every variable its own column. If the datasets are both already tidy, you will make them untidy with `pivot_wider()/spread()` and then tidy them again with `pivot_longer/gather()` to demonstrate your use of the functions. It's fine to wait until you have your descriptives to use these functions (e.g., you might want to pivot_wider() to rearrange the data to make your descriptive statistics easier to look at); it's fine long as you use them at least once!
+
+    - Depending on your datasets, it might be a good idea to do this before joining. For example, if you have a dataset you like with multiple measurements per year, but you want to join by year, you could average over your numeric variables to get means/year, do counts for your categoricals to get a counts/year, etc.
+    
+    - If your data sets are already tidy, demonstrate the use of `pivot_longer()/gather()` and `pivot_wider()/spread()` on all or part of your data at some point in this document (e.g., after you have generated summary statistics in part 3, make a table of them wide instead of long).
+
+```{R}
+library(readxl)
+CD <- read_excel("CD.xlsx")
+CP <- read_excel("CP.xlsx")
+#View(CP)
+
+library(tidyr)
+#untidying data and retidying it since the data was already clean:
+uncleanCD <- CD %>% pivot_longer(!country, names_to = "Catagories", values_to = "Value") #messy CD
+uncleanCD %>% pivot_wider(names_from = Catagories, values_from = Value)#clean CD
+
+uncleanCP <- CP %>% pivot_longer(cols = Region:`Surface area (km2)`, names_to = "Catagories", values_to = "Value") #messy CP
+uncleanCP %>% pivot_wider(names_from = Catagories, values_from = Value)#clean CP
+
+#ez money, but since these are back to being the same datasets, I'll be using the og datasets for the rest of the code
+
+```
+    
+
+2. Join your 2+ separate data sources into a single dataset based on a common ID variable! If you can't find a good pair datasets to join, you may split one main dataset into two different datasets with a common ID variable in each, and then join them back together based on that common ID, but this is obviously less than ideal.
+
+    - You will document the type of join that you do (left/right/inner/full), including a discussion of how many observations were in each dataset, which observations in each dataset were dropped (if any) and why you chose this particular join. 
+```{R}
+library(dplyr)
+totaldata1 <- inner_join(CD, CP, by = "country")
+
+
+#*In the original datasets, CD had 167 observations, while CP had 229 observations. However in the joined datset there is only 146 observations. This is because when the two datasets were joined using inner_join observations were dropped. Since the datasets were joined by country, the dropped observations were countries. The observations that were dropped were countries in each dataset that were not in the other dataset. I specifically chose inner_join because I only wanted to retain rows in both datasets, so I could not use left/right join. I also wanted rows with all values so I could not use full join either. This is why I picked inner_join.
+```
+
+3. Create summary statistics
+
+    - Use *all six* core `dplyr` functions (`filter, select, arrange, group_by, mutate, summarize`) to manipulate and explore your dataset. For mutate, create a  new variable that is a function of at least one other variable, preferably using a dplyr vector function (see dplyr cheatsheet). It's totally fine to use the `_if`, `_at`, `_all` versions of mutate/summarize instead (indeed, it is encouraged if you have lots of variables)
+    
+    - Create summary statistics (`mean, sd, var, n, quantile, min, max, n_distinct, cor`, etc) for each of your numeric variables both overall and after grouping by one of your categorical variables (either together or one-at-a-time; if you have two categorical variables, try to include at least one statistic based on a grouping of two categorical variables simultaneously). If you do not have any categorical variables, create one using mutate (e.g., with `case_when` or `ifelse`) to satisfy the `group_by` requirements above. Ideally, you will find a way to show these summary statistics in an easy-to-read table (e.g., by reshaping). (You might explore the kable package for making pretty tables!) If you have lots of numeric variables (e.g., 10+), or your categorical variables have too many categories, just pick a few (either numeric variables or categories of a categorical variable) and summarize based on those. It would be a good idea to show a correlation matrix for your numeric variables (you will need it to make one of your plots).
+```{R}
+#filter 
+filter(totaldata1, life_expec >70)
+names(totaldata1)[18] <- "GDP_per_capita"
+filter(totaldata1, life_expec >70 & GDP_per_capita > 5000)
+```
+```{R}
+#select
+select(totaldata1, 1, 8, 15, 18, 48)
+```
+```{R}
+#arange
+arrange(totaldata1, desc(GDP_per_capita))
+```
+```{R}
+#group_by
+totaldata1 %>% group_by(Region) %>% summarize(n())
+```
+```{R}
+#mutate
+totaldata1 %>% mutate(exports_per_imports = exports/imports)
+```
+```{R}
+#summarize
+totaldata1 %>% summarize_all(funs(mean))
+```
+```{R}
+#summary stats 
+    #Before grouping by categorical ("overall")
+totaldata1 %>%
+  group_by() %>%
+  summarise(across(
+    .cols = is.numeric, 
+    .fns = list(Mean = mean, SD = sd, Min= min, Max = max, Sum = sum), na.rm = TRUE, 
+    .names = "{col}_{fn}"
+    ))
+```
+```{R}
+    #After grouping by categorical
+totaldata1 %>%
+  group_by(Region) %>%
+  summarise(across(
+    .cols = is.numeric, 
+    .fns = list(Mean = mean, SD = sd, Min= min, Max = max, Sum = sum), na.rm = TRUE, 
+    .names = "{col}_{fn}"
+    ))
+```
+
+4. Make visualizations (three plots)
+
+    -  Make a correlation heatmap of your numeric variables
+    -  Create at least two additional plots of your choice with ggplot that highlight some of the more interesting features of your data.
+    - Each plot (besides the heatmap) should have at least three variables mapped to separate aesthetics
+    - Each should use different geoms (e.g., don't do two geom_bars)
+    - At least one plot should include `stat="summary"`
+    - Each plot should include a supporting paragraph describing the relationships that are being visualized and any trends that are apparent
+        - It is fine to include more, but limit yourself to 4. Plots should avoid being redundant! Four bad plots will get a lower grade than two good plots, all else being equal.
+    - Make them pretty! Use correct labels, etc.
+    
+```{R}
+#Correlation Matrix:
+
+#colnames(totaldata1) #I use this periodically to help rename the column rows to                             make it easier to insert in functions
+totaldata1 <- subset(totaldata1, select = -c(59)) #removing column
+
+cormat <- totaldata1 %>% select_if(is.numeric) %>% cor(use="pair")
+library(tidyverse)
+tidycormat <- cormat %>% as.data.frame %>% rownames_to_column("var1") %>%  pivot_longer(-1,names_to="var2",values_to="correlation")
+
+#Heatmap:
+
+totaldata1 %>% select_if(is.numeric) %>% cor %>% as.data.frame %>%  rownames_to_column %>% pivot_longer(-1) %>%  ggplot(aes(rowname,name,fill=value))+geom_tile()+  geom_text(aes(label=round(value,2)), position = position_dodge(width=.5),  size= 0)+  xlab("")+ylab("") + theme(axis.text.x = element_text(angle = 90, hjust=1))
+
+```
+
+```{R}
+
+#Plot One & Analysis Paragraph: Jitter, Country's GDP, Life Expectancy, & Sex Ratio
+
+names(totaldata1)[15] <- "Sex_ratio"
+
+ggplot(data = totaldata1, aes(x= GDP_per_capita, y = life_expec, color = Sex_ratio >100)) + geom_jitter() + labs(x = "GDP Per Capita", y = "Life Expectancy", title = "Country's GDP, Life Expectancy, & Sex Ratio", color = "Men pop. > women pop.", labels = c("> 90", "< 90")) + theme(axis.text.x = element_text(angle = 90, hjust=1)) + theme(legend.title = element_text(colour="blue", size=10, face="bold"))+                              # coloring the grouping variable
+  stat_summary(fun.y = "mean", geom = "point") +        # adding data points
+  stat_summary(fun.y = "mean", geom = "line") +         # adding connecting lines
+  stat_summary(fun.data = "mean_se", geom = "errorbar") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +  # add more tick marks
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+
+
+    #In this plot there were three main variables being plotted, a country's GDP (Gross Domestic Product in millions, US dollars) compared to life expectancy and the if the population of men was larger. I chose these three choices because I wanted to see if there was a correlation between any of them, since the wealthier a nation is the better, I assume, their healthcare might be. This was shown clearly as there is a logarithmic-like curve between life expectancy and GDP. However the sex ratio variable showed no clear correlation with GPD but populations with more men (per 100 females counted) did seem to have a higher life expectancy than populations with more women. This is really interesting because globally women live longer than men, so I would have assumed populations with more women would tend to have a higher average life expectancy. However the data based of this graph is not conclusive enough to come to any assumption.
+```
+
+```{R}
+
+#Plot Two & Analysis Paragraph: Jitter, Countries GDP, Life Expectancy, & Sex Ratio
+names(totaldata1)[48] <- "Women_in_Parliment"
+names(totaldata1)[36] <- "Fertility_rate"
+names(totaldata1)[25] <- "Unemployment"
+
+fr <-totaldata1$Fertility_rate > 2.4
+totaldata1_mod <- totaldata1
+
+  #Dividing by facets, the TRUE indicates Unemployment > 4
+
+ggplot(totaldata1_mod, aes(x = Women_in_Parliment, fill = fr)) +
+  geom_histogram(position = "identity", alpha = 0.4)+
+  facet_grid(Unemployment > 4 ~ .) + labs(x = "Women In Parliment", title = "Country's Women in Parliment, Fertility Rate, & Unemployment", fill = " Fertility Rate >2.4") 
+
+
+  #In this plot they were three main variables being plotted, the percent of women in parliament, the fertility rate of the country, and the unemployment percent. I chose these three variables because I wanted to see if there was a correlation between any of the three. I had assumed that the higher the percentage of women in Parliament would mean that there was a lower fertility rate, because that would mean that more women are getting an education, and the more women that get an education would be likely to hold off on having children- if they decide on having children at all. I also chose unemployment as a factor, because I assumed there would be a correlation with more women in Parliament (subsequently getting an education) meaning less people in unemployment. I also assume that the less unemployment there is the lower the fertility rate because most people would be too busy working to take care of children. However the statistics show little to no correlation between the fertility rate and women in Parliament; there was also little to no correlation between unemployment and women in Parliament. Lastly there was also little to no correlation between unemployment and fertility rate. Although this data is not enough to make any final assumptions, there was no evidence to show that there would be any correlation with further research.
+```    
+    
+5. Perform k-means/PAM clustering or PCA on (at least) your numeric variables.
+
+    - Include all steps as we discuss in class, including a visualization.
+
+    - If you don't have at least 3 numeric variables, or you want to cluster based on categorical variables too, convert them to factors in R, generate Gower's dissimilarity matrix on the data, and do PAM clustering on the dissimilarities.
+    
+    - Show how you chose the final number of clusters/principal components 
+    
+    - Interpret the final clusters/principal components 
+
+    - For every step, document what your code does (in words) and what you see in the data!     
+```{R}
+#Dimensionality Reduction
+
+  #turning my variables into numeric 
+totaldata1$Women_in_Parliment = as.numeric(as.factor(totaldata1$Women_in_Parliment))
+totaldata1$Sex_ratio = as.numeric(as.factor(totaldata1$Sex_ratio))
+totaldata1$Fertility_rate = as.numeric(as.factor(totaldata1$Fertility_rate))
+
+nonadata <-totaldata1  %>%  na.omit()  %>%  select("Women_in_Parliment", "Sex_ratio", "Fertility_rate") #omiting NAs 
+
+library(cluster)
+sil_width<-vector() #empty vector to hold mean sil width
+for(i in 2:10){    
+kms <- kmeans(nonadata,centers=i) #compute k-means solution  
+sil <- silhouette(kms$cluster,dist(nonadata)) #get sil widths
+sil_width[i]<-mean(sil[,3]) #take averages (higher is better)
+}
+ggplot()+geom_line(aes(x=1:10,y=sil_width))+scale_x_continuous(name="k",breaks=1:10) #Silhouette width
+
+
+kmeans1 <- nonadata %>% scale %>% kmeans(3) #set number of clusters k
+kmeans1
+
+kmeansclust <- nonadata %>% mutate(cluster=as.factor(kmeans1$cluster)) #saving cluster assignment as a column in your dataset
+kmeansclust %>% ggplot(aes(Women_in_Parliment,Sex_ratio,Fertility_rate,color= Fertility_rate)) + geom_point() + labs(x = "Women In Parliment", y = "Sex Ratio (Men per 100 Women)", title = "Country's Women in Parliment, Fertility Rate, & Sex Ratio") #Plotting of data colored by 3rd variable
+
+#clust_dat1 <- disnet1 %>% dplyr::select(Women_in_Parliment,Sex_ratio,Fertility_rate)
+#kmeans3 <-clust_dat1 %>%kmeans(3)
+
+
+kmeansclust <- nonadata %>% as.data.frame() %>% mutate(cluster=as.factor(kmeans1$cluster))
+library(GGally)
+ggpairs(kmeansclust, columns =1:3, aes(color=cluster), upper= NULL)
+
+  #In this plot they were three main variables being plotted, the percent of women in parliament, the fertility rate of the country, and the sex ratio (men per 100 women). Although there was no strong correlation to be seen there were some interesting light trends that could be interpreted. One of the trends is that the less men there were compared to women, the more women would be in Parliament. It's quite interesting because in many women population dominated countries there still majority of men in politics, however this slight trend shows that there is a higher percentage of women in parliament when there are less men (per 100 women). Another interesting thing I found was that fertility rate its lowest in areas where there were very little men per hundred women; in fact the fertility rate did not increase over 20% in areas where there was 25% or less sex ratio. But the opposing is not true, in areas where there was plenty of men the fertility rate was still not very high. The highest fertility rate happened, surprisingly, where the sex ratio was about/around 50%. Lastly, the fertility rate and percent of women in parliament had no visible trend, it was very sporadic. I do believe variant could have been a huge factor in this data considering we don't know how accurate this data is or by what means it was collected. Although no assumptions can be made based off this data alone, there are some trends that would be interesting to explore in the future. 
+```
+<P style="page-break-before: always">
+\newpage
+    
+### Rubric
+
+Prerequisite: Finding appropriate data from at least two sources per the instructions above: Failure to do this will result in a 0! You will submit a .Rmd file and a knitted document (html/pdf).
+
+#### 0. Introduction (5  pts)
+
+- Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.
+
+#### 1. Tidying: Rearranging Wide/Long (10 pts)
+
+- Tidy the datasets (using the `tidyr` functions `pivot_longer`/`gather` and/or `pivot_wider`/`spread`) 
+- If you data sets are already tidy, be sure to use those functions somewhere else in your project (e.g., for rearranging summary statistics)
+- Document the process (describe in words what was done)
+    
+#### 2. Joining/Merging (10 pts)
+
+- Join your datasets into one using a `dplyr` join function
+- If you have multiple observations on the joining variable in either dataset, fix this by collapsing via summarize
+- Discuss the process in words, including why you chose the join you did
+- Discuss which cases were dropped, if any, and potential problems with this
+
+#### 3. Wrangling (40 pts)
+
+- Use all six core `dplyr` functions in the service of generating summary tables/statistics (12 pts)
+    - Use mutate at least once to generate a variable that is a function of at least one other variable
+
+- Compute summary statistics for each of your variables using `summarize` alone and with `group_by` (if you have more than 10 variables, fine to just focus on 10) (20 pts)
+    - Use at least 5 unique functions inside of summarize (e.g., mean, sd)
+    - For at least 2, use summarize after grouping by a categorical variable. Create one by dichotomizing a numeric if necessary
+    - If applicable, at least 1 of these should group by two categorical variables
+
+- Summarize the procedure and discuss all (or the most interesting) results in no more than two paragraphs (8 pts)
+
+
+#### 4. Visualizing (30 pts)
+
+- Create a correlation heatmap of your numeric variables the way we did in class
+
+- Create two more effective, polished plots with ggplot
+
+    - Each plot should map 3+ variables to aesthetics 
+    - Each plot should have a title and clean labeling for all mappings
+    - Change at least one default theme element and color for at least one mapping per plot
+    - For at least one plot, add more tick marks (x, y, or both) than are given by default
+    - For at least one plot, use the stat="summary" function
+    - Supporting paragraph or two (for each plot) describing the relationships/trends that are apparent
+    
+#### 5. Dimensionality Reduction (30 pts) 
+
+- Either k-means/PAM clustering or PCA (inclusive "or") should be performed on at least three of your variables (3 is just the minimum: using more/all of them will make this much more interesting!)
+
+    - All relevant steps discussed in class (e.g., picking number of PCs/clusters)
+    - A visualization of the clusters or the first few principal components (using ggplot2)
+    - Supporting paragraph or two describing results found, interpreting the clusters/PCs in terms of the original variables and observations, discussing goodness of fit or variance explained, etc.
+
+
+#### 6. Neatness, Holistic/Discretionary Points (5 pts)
+
+- Keep things looking nice! Your project should not knit to more than 30 or so pages (probably closer to 10-20)! You will lose points if you print out your entire dataset(s), have terrible formatting, etc. If you start your project in a fresh .Rmd file, you are advised to copy set-up code below and include it: this will do things like automatically truncate if you accidentally print out a huge dataset, etc. Imagine this is a polished report you are giving to your PI or boss to summarize your work researching a topic.
+
+```{r eval=F}
+## paste this chunk into the ```{r setup} chunk at the top of your project 1 .Rmd file
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+```{R}
+#cortd <- 
+totaldata1

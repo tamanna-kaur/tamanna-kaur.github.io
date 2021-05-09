@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Tamanna Kaur" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 2: Modeling, Testing, and Predicting</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project2/">Project 2: Modeling, Testing, and Predicting</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="modeling" class="section level1">
+<h1>Modeling</h1>
+<ul>
+<li><strong>0. (5 pts)</strong> Introduce your dataset and each of your variables (or just your main variables if you have lots) in a paragraph. What are they measuring? How many observations?</li>
+</ul>
+<pre class="r"><code>library(readxl)
+Affairs &lt;- read_excel(&quot;Affairs.xlsx&quot;)
+#View(Affairs)</code></pre>
+<p>***Hello! My dataset is a cross-section data of married people from a survey conducted by Psychology Today in 1969. It was about extramarital affairs, but the amount of factos allows for lots of correlations to be tested of married people. It contains nine variable: affairs, gender, age, years married, children, religiousness, education, occupation, and rating of their life. The survey asked 601 participants. Only 2 variables are numeric: religiousness and rating. The rest are categorical, despite it being in number form they are in discrete groups.</p>
+<p>The variables break down like this:</p>
+<p>affairs = How often engaged in extramarital sexual intercourse during the past year?</p>
+<p>gender= male or female</p>
+<p>age = numeric variable coding age in years: 17.5 = under 20, 22 = 20–24, 27 = 25–29, 32 = 30–34, 37 = 35–39, 42 = 40–44, 47 = 45–49, 52 = 50–54, 57 = 55 or over.</p>
+<p>yearsmarried = numeric variable coding number of years married: 0.125 = 3 months or less, 0.417 = 4–6 months, 0.75 = 6 months–1 year, 1.5 = 1–2 years, 4 = 3–5 years, 7 = 6–8 years, 10 = 9–11 years, 15 = 12 or more years.</p>
+<p>children= do you have children? yes or no.</p>
+<p>religiousness = numeric variable coding religiousness: 1 = anti, 2 = not at all, 3 = slightly, 4 = somewhat, 5 = very.</p>
+<p>education = numeric variable coding level of education: 9 = grade school, 12 = high school graduate, 14 = some college, 16 = college graduate, 17 = some graduate work, 18 = master’s degree, 20 = Ph.D., M.D., or other advanced degree.</p>
+<p>occupation = numeric variable coding occupation according to Hollingshead classification (reverse numbering).</p>
+<p>rating = numeric variable coding self rating of marriage: 1 = very unhappy, 2 = somewhat unhappy, 3 = average, 4 = happier than average, 5 = very happy.***</p>
+<ul>
+<li><strong>1. (15 pts)</strong>
+Perform a MANOVA testing whether any of your numeric variables (or a subset of them, if including them all is unreasonable or doesn’t make sense) show a mean difference across levels of one of your categorical variables (3).</li>
+</ul>
+<p>If they do, perform univariate ANOVAs to find response(s) showing a mean difference across groups (3), and perform post-hoc t tests to find which groups differ (3).</p>
+<p>Discuss the number of tests you have performed, calculate the probability of at least one type I error (if unadjusted), and adjust the significance level accordingly (bonferroni correction) before discussing significant differences (3).</p>
+<p>Briefly discuss some of the MANOVA assumptions and whether or not they are likely to have been met here (no need for anything too in-depth) (2).</p>
+<pre class="r"><code>#manova
+manAffairs &lt;- manova(cbind(religiousness,rating)~gender, data=Affairs)
+summary(manAffairs)</code></pre>
+<pre><code>##            Df     Pillai approx F num Df den Df Pr(&gt;F)
+## gender      1 0.00011846 0.035423      2    598 0.9652
+## Residuals 599</code></pre>
+<pre class="r"><code>#univariate Anova and post-hoc t-test
+summary.aov(manAffairs)</code></pre>
+<pre><code>##  Response religiousness :
+##              Df Sum Sq Mean Sq F value Pr(&gt;F)
+## gender        1   0.05 0.04823  0.0353  0.851
+## Residuals   599 817.80 1.36527               
+## 
+##  Response rating :
+##              Df Sum Sq Mean Sq F value Pr(&gt;F)
+## gender        1   0.04 0.04133  0.0339  0.854
+## Residuals   599 730.16 1.21897</code></pre>
+<pre class="r"><code>pairwise.t.test(Affairs$religiousness,Affairs$gender, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  Affairs$religiousness and Affairs$gender 
+## 
+##      female
+## male 0.85  
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(Affairs$rating,Affairs$gender, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  Affairs$rating and Affairs$gender 
+## 
+##      female
+## male 0.85  
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>#tests, probability of error
+1-(0.95^5)</code></pre>
+<pre><code>## [1] 0.2262191</code></pre>
+<pre class="r"><code>0.05/5</code></pre>
+<pre><code>## [1] 0.01</code></pre>
+<pre class="r"><code>pairwise.t.test(Affairs$religiousness,Affairs$gender, p.adj=&quot;none&quot;)$p.value&lt;0.05/5</code></pre>
+<pre><code>##      female
+## male  FALSE</code></pre>
+<pre class="r"><code>pairwise.t.test(Affairs$rating,Affairs$gender, p.adj=&quot;none&quot;)$p.value&lt;0.05/5</code></pre>
+<pre><code>##      female
+## male  FALSE</code></pre>
+<p><strong><em>I did a manova to test the mean difference in religiousness and rating of quality of life based on identified gender. THe results showed there was no significant differences in religiousness or rating of quality of life depending on gender (p=0.9652). I still ran a univariate ANOVA test to find responses showing a mean difference across the groups. I found that religiousness in gender had a p value of 0.851, making it insignificant. I also found that rating in gender had a p value of 0.854, also making it insignificant. I then performed post-hoc t-tests to show which groups differ by gender. This required the Bonferroni correction for the number of tests performed (which was 5, 1 MANOVA, 2 univariate ANOVAs and 2 post-hoc) because the probability of making a Type I error was 1-(0.95)^5, or 0.2262191. After adjustment (0.05/5= 0.1) to the significance level it’s proven none of the tests are significant. The dataset meets most of the assumptions for the MANOVA test like random samples, no extreme outliers, independent observations. but there may not be a normal distribution,equal variance, or even a linear relationship between the religiousness and rating of quality of life by gender.</em></strong></p>
+<ul>
+<li><strong>2. (10 pts)</strong>
+Perform some kind of randomization test on your data (that makes sense). The statistic can be anything you want (mean difference, correlation, F-statistic/ANOVA, chi-squared), etc. State null and alternative hypotheses, perform the test, and interpret the results (7).
+Create a plot visualizing the null distribution and the test statistic (3).</li>
+</ul>
+<pre class="r"><code>Affairs%&gt;%group_by(gender)%&gt;%summarize(means=mean(rating))%&gt;%summarize(&#39;mean_diff&#39;= diff(means)) #-0.01660562</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   mean_diff
+##       &lt;dbl&gt;
+## 1   -0.0166</code></pre>
+<pre class="r"><code>rand_dist&lt;- vector()
+for(i in 1:5000){
+  new&lt;- data.frame(rating=sample(Affairs$rating), gender=Affairs$gender)
+  rand_dist[i] &lt;- mean(new[new$gender == &quot;male&quot;,]$rating)-mean(new[new$gender == &quot;female&quot;,]$rating)
+}
+
+mean(rand_dist &lt; -0.01660562 | rand_dist &gt; 0.01660562)</code></pre>
+<pre><code>## [1] 0.8582</code></pre>
+<pre class="r"><code>{hist(rand_dist,main =&quot;&quot;,ylab=&quot;&quot;); abline(v = c(-0.01660562, 0.01660562), col=&quot;red&quot;)}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" />
+<strong><em>I used a mean difference randomization test. The null hypothesis is the rating of quality of life will be the same between females and males. THe alternative hypothesis is that the rating of quality of life differs between females and males. The tests gave a p-value greater than 0.05 (p= 0.8566), meaning the null hypothesis is not rejected, meaning there is not a significant difference in the rating of quality of life between females and males.</em></strong></p>
+<ul>
+<li><p><strong>3. (40 pts)</strong> Build a linear regression model predicting one of your response variables from at least 2 other variables, including their interaction. Mean-center any numeric variables involved in the interaction.</p>
+<ul>
+<li>Interpret the coefficient estimates (do not discuss significance) (10)</li>
+<li>Plot the regression using <code>ggplot()</code> using geom_smooth(method=“lm”). If your interaction is numeric by numeric, refer to code in the slides to make the plot or check out the <code>interactions</code> package, which makes this easier. If you have 3 or more predictors, just chose two of them to plot for convenience. (10)</li>
+<li>What proportion of the variation in the outcome does your model explain? (4)</li>
+<li>Check assumptions of linearity, normality, and homoskedasticity either graphically or using a hypothesis test (5)</li>
+<li>Regardless, recompute regression results with robust standard errors via <code>coeftest(..., vcov=vcovHC(...))</code>. Discuss significance of results, including any changes from before/after robust SEs if applicable. (10)</li>
+</ul></li>
+</ul>
+<pre class="r"><code>Affairs&lt;-Affairs%&gt;%mutate(meanRating=rating-mean(rating),meanReligousness=religiousness-mean(religiousness))
+
+f2 &lt;- lm(meanRating ~ meanReligousness*gender, data=Affairs); summary(f2)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = meanRating ~ meanReligousness * gender,
+data = Affairs)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -2.97333 -0.91652 0.07124 1.04676 1.19913
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 0.007798 0.062252 0.125 0.900
+## meanReligousness -0.012241 0.054945 -0.223 0.824
+## gendermale -0.017042 0.090242 -0.189 0.850
+## meanReligousness:gendermale 0.069728 0.077274 0.902
+0.367
+##
+## Residual standard error: 1.105 on 597 degrees of freedom
+## Multiple R-squared: 0.002011, Adjusted R-squared:
+-0.003004
+## F-statistic: 0.401 on 3 and 597 DF, p-value: 0.7524</code></pre>
+<pre class="r"><code>ggplot(Affairs, aes(x=meanReligousness, y=meanRating,group=gender))+geom_point(aes(color=gender))+
+  geom_smooth(method=&quot;lm&quot;,aes(color=gender))+xlab(&quot;Mean-Centered Religiousness&quot;)+ylab(&quot;Mean-Centered Quality of Life&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>f2residuals&lt;-f2$residuals
+f2fit&lt;-f2$fitted.values
+ggplot()+geom_point(aes(f2fit,f2residuals))+geom_hline(yintercept=0, color=&#39;red&#39;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot()+geom_histogram(aes(f2residuals), bins=20)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-3.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot()+geom_qq(aes(sample=f2residuals))+geom_qq_line(aes(sample=f2residuals))</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-4.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>shapiro.test(f2residuals)</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  f2residuals
+## W = 0.85704, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(sandwich)
+library(lmtest)
+bptest(f2)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  f2
+## BP = 3.0425, df = 3, p-value = 0.3851</code></pre>
+<pre class="r"><code>summary(f2)$coef%&gt;%round(4)</code></pre>
+<pre><code>## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 0.0078 0.0623 0.1253 0.9004
+## meanReligousness -0.0122 0.0549 -0.2228 0.8238
+## gendermale -0.0170 0.0902 -0.1888 0.8503
+## meanReligousness:gendermale 0.0697 0.0773 0.9024 0.3672</code></pre>
+<pre class="r"><code>coeftest(f2, vcov = vcovHC(f2))</code></pre>
+<pre><code>##
+## t test of coefficients:
+##
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 0.0077977 0.0649841 0.1200 0.9045
+## meanReligousness -0.0122405 0.0583155 -0.2099 0.8338
+## gendermale -0.0170416 0.0901597 -0.1890 0.8501
+## meanReligousness:gendermale 0.0697279 0.0768063 0.9078
+0.3643</code></pre>
+<p><strong><em>THe first thing to note here is that my numeric variables of religiousness and rating of quality of life were discrete, it was a number on a scale from 1-5, which causes the graphs to show up a little different. I used a linear regression model to predict gender relative to the rating of quality of life and religiousness. The coefficient estimates show that for women the average rating of quality of life is 0.0078 when religiousness is zero. For every one unit increase in religiousness, rating of quality of life goes down by 0.01224 for females. Also, males with a religiousness rating of zero have a predicted rating of quality of life that is -0.0170416. The slope of religiousness on rating of quality of life is 0.06972 higher than females. When checking assumptions for homoskedasticity, the model does not display linearity or homoskedasticity via graphically and using a hypothesis test, nor does it pass the normality assumption. Meaning the model is not satisfactory. Using robust standard errors, the relationship tested did not change in values, but the p-value did change to p&gt;0.05.</em></strong></p>
+<p><strong><em>From the adjusted R-squared of the linear model created, we see that 38.73% of the total variation this model can explain. There is a weak linearity according to the model, the residual plot shows the data does not meet the assumption of homoskedasticity, despite being fitted. This is also due to the fact that these are discrete numeric variables, but even taking that into account it does not meet the assumption. Since the p value was 0.9416 (through the Breusch-Pagan test), the data was not significant. There was also a lack of normal distribution on the histogram, more of an upward trend between the variables, and the Q-Q plot not following the trend line for each discrete variable. This was also verified with the Shapiro-Wilk test.</em></strong></p>
+<ul>
+<li><strong>4. (5 pts)</strong> Rerun same regression model (with the interaction), but this time compute bootstrapped standard errors (either by resampling observations or residuals). Discuss any changes you observe in SEs and p-values using these SEs compared to the original SEs and the robust SEs)</li>
+</ul>
+<pre class="r"><code>set.seed(348)
+  f2&lt;-lm(meanRating ~ meanReligousness*gender, data=Affairs)
+  f2residuals&lt;-f2$residuals
+  f2fit&lt;-f2$fitted.values 
+  
+  r&lt;-replicate(5000,{
+    r2&lt;-sample(f2residuals,replace=TRUE)
+    Affairs$nRate&lt;-f2fit+r2 
+    f2&lt;-lm(nRate~meanReligousness*gender, data=Affairs)
+    coef(f2)
+})
+r%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)%&gt;%pivot_longer(1:4,names_to = &quot;Coefficient&quot;, values_to = &quot;Bootstrapped SE&quot;)</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   Coefficient                 `Bootstrapped SE`
+##   &lt;chr&gt;                                   &lt;dbl&gt;
+## 1 (Intercept)                            0.0628
+## 2 meanReligousness                       0.0554
+## 3 gendermale                             0.0903
+## 4 meanReligousness:gendermale            0.0785</code></pre>
+<pre class="r"><code>summary(f2)$coef%&gt;%round(4)</code></pre>
+<pre><code>## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 0.0078 0.0623 0.1253 0.9004
+## meanReligousness -0.0122 0.0549 -0.2228 0.8238
+## gendermale -0.0170 0.0902 -0.1888 0.8503
+## meanReligousness:gendermale 0.0697 0.0773 0.9024 0.3672</code></pre>
+<pre class="r"><code>coeftest(f2, vcov = vcovHC(f2))</code></pre>
+<pre><code>##
+## t test of coefficients:
+##
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 0.0077977 0.0649841 0.1200 0.9045
+## meanReligousness -0.0122405 0.0583155 -0.2099 0.8338
+## gendermale -0.0170416 0.0901597 -0.1890 0.8501
+## meanReligousness:gendermale 0.0697279 0.0768063 0.9078
+0.3643</code></pre>
+<p><strong><em>There was no significant changes in bootstrapped standard errors or p- values compared to the original SEs or the robust SEs. BUT there was a very small difference of the bootstrapped SEs difference with the robust SEs being a smidge larger than the bootstrapped SEs difference with the original SEs. But the difference is so small, it has no evidence of meaning anything significant. DUe to these minuscule changes we can assume the p-values in either comparison do not change significantly either.</em></strong></p>
+<ul>
+<li><p><strong>5. (30 pts)</strong> Fit a logistic regression model predicting a binary variable (if you don’t have one, make/get one) from at least two explanatory variables (interaction not necessary).</p>
+<ul>
+<li>Interpret coefficient estimates in context (10)</li>
+<li>Report a confusion matrix for your logistic regression (5)</li>
+<li>Compute and discuss the Accuracy, Sensitivity (TPR), Specificity (TNR), Precision (PPV), and AUC of your model (5)</li>
+<li>Using ggplot, make a density plot of the log-odds (logit) colored/grouped by your binary outcome variable (5)</li>
+<li>Generate an ROC curve (plot) and calculate AUC (either manually or with a package); interpret (5)</li>
+</ul></li>
+</ul>
+<pre class="r"><code>data&lt;-Affairs%&gt;%mutate(y=ifelse(meanRating&gt;0,0,1),outcome=ifelse(meanRating&gt;0,0,1))
+limlog&lt;-glm(y~meanReligousness+gender, data=data, family=binomial)
+coeftest(limlog)</code></pre>
+<pre><code>##
+## z test of coefficients:
+##
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) -0.8856608 0.1239261 -7.1467 8.89e-13 ***
+## meanReligousness -0.0200067 0.0769520 -0.2600 0.7949
+## gendermale -0.0086378 0.1798149 -0.0480 0.9617
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>exp(coeftest(limlog))</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##                  Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)       0.41244    1.13193  0.0008    1.000
+## meanReligousness  0.98019    1.07999  0.7711    2.214
+## gendermale        0.99140    1.19700  0.9531    2.616</code></pre>
+<pre class="r"><code>#Confusion matrix
+probs&lt;-predict(limlog,type=&quot;response&quot;)
+table(predict=as.numeric(probs&gt;.5),truth=data$y)%&gt;%addmargins</code></pre>
+<pre><code>##        truth
+## predict   0   1 Sum
+##     0   426 175 601
+##     Sum 426 175 601</code></pre>
+<pre class="r"><code>data$prob &lt;- predict(limlog,type=&quot;response&quot;)
+data$predicted &lt;- ifelse(data$prob&gt;.5,&quot;Less than 3 Rating&quot;,&quot;3 or More Rating&quot;)
+data$outcome&lt;-factor(data$outcome,levels=c(&quot;0&quot;,&quot;1&quot;)) #rename
+levels(data$outcome) &lt;- c(&quot;Less than 3 Rating&quot;, &quot;3 or More Rating&quot;) #rename
+table(truth=data$outcome, prediction=data$predicted)%&gt;%addmargins</code></pre>
+<pre><code>##                     prediction
+## truth                3 or More Rating Sum
+##   Less than 3 Rating              426 426
+##   3 or More Rating                175 175
+##   Sum                             601 601</code></pre>
+<pre class="r"><code>class_diag(data$prob,data$outcome)</code></pre>
+<pre><code>##                        acc sens spec ppv       auc
+## 3 or More Rating 0.7088186    0    1 NaN 0.5072099</code></pre>
+<pre class="r"><code>data$logit&lt;-predict(limlog)
+#Density Plot
+ggplot(data,aes(logit, fill=outcome))+geom_density(alpha=.3)+geom_rug(aes(logit,color=outcome))+
+  geom_vline(xintercept=0,lty=2)+theme(legend.position=c(.125,.875))+xlab(&quot;logit (log-odds)&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#ROC curve and AUC
+library(plotROC)
+ROCplot&lt;-ggplot(data)+geom_roc(aes(d=outcome,m=prob), n.cuts=0)+geom_segment(aes(x=0,y=0,xend=1,yend=1),lty=2)+xlab(&quot;FPR&quot;)+ylab(&quot;TPR&quot;)
+ROCplot</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.4927901</code></pre>
+<p><strong><em>I used a logistic regression to predict the odds of a participant having a result of less than 3 of religiousness based on gender. Using a significance level of 0.05, none of the groups are of interest. It shows males have an coefficient estimate of -0.0885 of religiousness at the intercept. The intercept predicts the mens level of religiousness decrease with the increase of their rating of quality of life. This is quite interesting. THe odds of having less than a 3 on the religious survey as quality of life increases is 38%. When i created a confusion matrix, it showed the accuracy of the model predicting quality of life by religiousness scoring 29.11% (175/601). The ROC curve/ AUC calculation show a strong trend line and a AUC of 0.507 meaning it shows a strong predictor between religiousness and quality of life.</em></strong></p>
+<ul>
+<li><p><strong>6. (25 pts)</strong> Perform a logistic regression predicting the same binary response variable from <em>ALL</em> of the rest of your variables (the more, the better!)</p>
+<ul>
+<li>Fit model, compute in-sample classification diagnostics (Accuracy, Sensitivity, Specificity, Precision, AUC), and interpret (5)</li>
+<li>Perform 10-fold (or repeated random sub-sampling) CV with the same model and report average out-of-sample classification diagnostics (Accuracy, Sensitivity, Specificity, Precision, and AUC); interpret AUC and compare with the in-sample metrics (10)</li>
+<li>Perform LASSO on the same model/variables. Choose lambda to give the simplest model whose accuracy is near that of the best (i.e., <code>lambda.1se</code>). Discuss which variables are retained. (5)</li>
+<li>Perform 10-fold CV using only the variables lasso selected: compare model’s out-of-sample AUC to that of your logistic regressions above (5)</li>
+</ul></li>
+</ul>
+<pre class="r"><code>dataf&lt;-Affairs%&gt;%mutate(y=ifelse(meanRating&gt;0,0,1),outcomef=ifelse(meanRating&gt;0,0,1))
+log&lt;-glm(y~meanReligousness+gender+affairs+yearsmarried+children+education+occupation, data=dataf, family=binomial)
+
+coeftest(log)</code></pre>
+<pre><code>##
+## z test of coefficients:
+##
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 0.499263 0.669068 0.7462 0.455543
+## meanReligousness -0.035823 0.084313 -0.4249 0.670922
+## gendermale 0.176205 0.217917 0.8086 0.418753
+## affairs 0.118297 0.027371 4.3219 1.547e-05 ***
+## yearsmarried 0.042312 0.021078 2.0073 0.044714 *
+## childrenyes 0.269898 0.268796 1.0041 0.315330
+## education -0.148214 0.046407 -3.1938 0.001404 **
+## occupation 0.035052 0.065705 0.5335 0.593707
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>exp(coeftest(log))</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##                  Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)       1.64751    1.95242  2.1090    1.577
+## meanReligousness  0.96481    1.08797  0.6538    1.956
+## gendermale        1.19268    1.24348  2.2447    1.520
+## affairs           1.12558    1.02775 75.3331    1.000
+## yearsmarried      1.04322    1.02130  7.4435    1.046
+## childrenyes       1.30983    1.30839  2.7295    1.371
+## education         0.86225    1.04750  0.0410    1.001
+## occupation        1.03567    1.06791  1.7048    1.811</code></pre>
+<pre class="r"><code>dataf$probf &lt;- predict(log,type=&quot;response&quot;)
+dataf$predictedf &lt;- ifelse(dataf$probf&gt;.5,&quot;Less than 3 Rating&quot;,&quot;3 or More Rating&quot;)
+dataf$outcomef&lt;-factor(dataf$outcomef,levels=c(&quot;0&quot;,&quot;1&quot;))
+levels(dataf$outcomef) &lt;- c(&quot;Less than 3 Rating&quot;,&quot;3 or More Rating&quot;)
+table(truth=dataf$outcomef, prediction=dataf$predictedf)%&gt;%addmargins</code></pre>
+<pre><code>## prediction
+## truth 3 or More Rating Less than 3 Rating Sum
+## Less than 3 Rating 408 18 426
+## 3 or More Rating 143 32 175
+## Sum 551 50 601</code></pre>
+<pre class="r"><code>class_diag(dataf$probf,dataf$outcomef)</code></pre>
+<pre><code>## acc sens spec ppv auc
+## 3 or More Rating 0.7321131 0.1828571 0.9577465 0.64
+0.6587592</code></pre>
+<pre class="r"><code>set.seed(348)
+k=10
+dat&lt;-dataf[sample(nrow(dataf)),] 
+folds&lt;-cut(seq(1:nrow(dataf)),breaks=k,labels=F)
+diags&lt;-NULL
+for(i in 1:k){
+  train&lt;-dat[folds!=i,] 
+  test&lt;-dat[folds==i,]
+  
+  truth&lt;-test$y
+  
+  fitf&lt;-glm(y~rating+gender+affairs+yearsmarried+children+education+occupation,data=train,family=&quot;binomial&quot;)
+  
+  probs&lt;-predict(fitf,newdata = test,type=&quot;response&quot;)
+  
+  diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>##   acc sens spec ppv auc
+## 1   1    1    1   1   1</code></pre>
+<pre class="r"><code>library(glmnet)
+set.seed(348)
+y&lt;-as.matrix(dataf$y)
+x&lt;-model.matrix(y~meanReligousness+gender+affairs+yearsmarried+children+education+occupation,data=dataf)[,-1]
+cv&lt;-cv.glmnet(x,y)
+{plot(cv$glmnet.fit, &quot;lambda&quot;, label=TRUE); abline(v = log(cv$lambda.1se)); abline(v = log(cv$lambda.min),lty=2)}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cv&lt;-cv.glmnet(x,y,family=&quot;binomial&quot;)
+lasso&lt;-glmnet(x,y,family=&quot;binomial&quot;,lambda=cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 8 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                            s0
+## (Intercept)      -0.955112165
+## meanReligousness  .          
+## gendermale        .          
+## affairs           0.062530785
+## yearsmarried      0.008820769
+## childrenyes       .          
+## education        -0.006598649
+## occupation        .</code></pre>
+<pre class="r"><code>set.seed(348)
+k=10
+dat&lt;-dataf[sample(nrow(dataf)),] 
+folds&lt;-cut(seq(1:nrow(dataf)),breaks=k,labels=F)
+diags&lt;-NULL
+for(i in 1:k){
+  train&lt;-dat[folds!=i,] 
+  test&lt;-dat[folds==i,]
+  
+  truth&lt;-test$y
+  
+  fitf&lt;-glm(y~rating,data=train,family=&quot;binomial&quot;)
+  
+  probs&lt;-predict(fitf,newdata = test,type=&quot;response&quot;)
+  
+  diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>##   acc sens spec ppv auc
+## 1   1    1    1   1   1</code></pre>
+<p><strong><em>The accuracy, sens, spec, ppv, and auc respectively was 0.7321131, 0.1828571, 0.9577465, 0.64, 0.6587592. The model showed that increasing quality of life decreases religiousness in males. The accuracy, sens, spec, ppv, and auc all prove that the model is a good predictor of the data and is consistent. After performing the 10-fold CV, where the accuracy (1), sensitivity (1), specificity (1), precision (1), and AUC (1), shows the model is incredibly accurate in predicting, without correction. The LASSO had small coefficients but the most accurate lambda. The simple model also had a accuracy (1), sensitivity (1), specificity (1), precision (1), and AUC (1). Making it equal to the 10-fold model in their predictions. Overall the best models are the 10-fold and the simple, but they’re all great predictor models! Also the only values retained after conducting the LASSO were affairs, years married, and education.</em></strong></p>
+<pre class="r"><code>data(package = .packages(all.available = TRUE))</code></pre>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

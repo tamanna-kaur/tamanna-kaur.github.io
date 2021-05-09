@@ -1,0 +1,15 @@
+---
+title: What's poppin'?
+author: ''
+date: '2021-05-09'
+slug: what-s-poppin
+categories: []
+tags: []
+description: ''
+---
+
+Hola amigos! Welcome to my life!
+
+[Link to project 1](/project/project1/)
+
+[Link to google](https://www.google.com)

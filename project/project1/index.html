@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Tamanna Kaur" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 1: Exploratory Data Analysis</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project1/">Project 1: Exploratory Data Analysis</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="data-wrangling-and-data-exploration" class="section level2">
+<h2>Data Wrangling and Data Exploration</h2>
+<p>###Introduction!!!!</p>
+<p>I chose to datasets that focused on different countries’ statistics. The reason I chose these datasets is because I thought it would be really interesting to see the correlation different aspects of countries globally rather than just picking something that was in one specific area and based off one specific culture, to be able to see universal trends. So my data set under CP came from the UN data website which has collected from more than 20 International statistical sources that compiled regularly by the statistics and population divisions of the United Nations. My CD date came from HELP International which is an international humanitarian group that focuses on combating poverty and providing people with basic amenities and relief during disasters and natural calamities. Both data have been reviewed by a crowdsourced platform, and have been cited in many publications. Both datasets contain a lot of variables but the main focus of the variables are health, trade, women, income, and population. I’m personally really interested in the women, population, and income columns; I am expecting to see low fertility rates in areas where women have higher education, and areas with large GDP to have more women in Parliament.</p>
+<div id="guidelines" class="section level3">
+<h3>Guidelines</h3>
+<ol style="list-style-type: decimal">
+<li><p>If the datasets are not tidy, you will need to reshape them so that every observation has its own row and every variable its own column. If the datasets are both already tidy, you will make them untidy with <code>pivot_wider()/spread()</code> and then tidy them again with <code>pivot_longer/gather()</code> to demonstrate your use of the functions. It’s fine to wait until you have your descriptives to use these functions (e.g., you might want to pivot_wider() to rearrange the data to make your descriptive statistics easier to look at); it’s fine long as you use them at least once!</p>
+<ul>
+<li><p>Depending on your datasets, it might be a good idea to do this before joining. For example, if you have a dataset you like with multiple measurements per year, but you want to join by year, you could average over your numeric variables to get means/year, do counts for your categoricals to get a counts/year, etc.</p></li>
+<li><p>If your data sets are already tidy, demonstrate the use of <code>pivot_longer()/gather()</code> and <code>pivot_wider()/spread()</code> on all or part of your data at some point in this document (e.g., after you have generated summary statistics in part 3, make a table of them wide instead of long).</p></li>
+</ul></li>
+</ol>
+<pre class="r"><code>library(readxl)
+CD &lt;- read_excel(&quot;CD.xlsx&quot;)
+CP &lt;- read_excel(&quot;CP.xlsx&quot;)
+# View(CP)
+
+library(tidyr)
+# untidying data and retidying it since the data was already
+# clean:
+uncleanCD &lt;- CD %&gt;% pivot_longer(!country, names_to = &quot;Catagories&quot;, 
+    values_to = &quot;Value&quot;)  #messy CD
+uncleanCD %&gt;% pivot_wider(names_from = Catagories, values_from = Value)  #clean CD</code></pre>
+<pre><code>## # A tibble: 167 x 10
+##    country child_mort exports health imports income inflation life_expec
+##    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Afghan…       90.2    10     7.58    44.9   1610     9.44        56.2
+##  2 Albania       16.6    28     6.55    48.6   9930     4.49        76.3
+##  3 Algeria       27.3    38.4   4.17    31.4  12900    16.1         76.5
+##  4 Angola       119      62.3   2.85    42.9   5900    22.4         60.1
+##  5 Antigu…       10.3    45.5   6.03    58.9  19100     1.44        76.8
+##  6 Argent…       14.5    18.9   8.1     16    18700    20.9         75.8
+##  7 Armenia       18.1    20.8   4.4     45.3   6700     7.77        73.3
+##  8 Austra…        4.8    19.8   8.73    20.9  41400     1.16        82  
+##  9 Austria        4.3    51.3  11       47.8  43200     0.873       80.5
+## 10 Azerba…       39.2    54.3   5.88    20.7  16000    13.8         69.1
+## # … with 157 more rows, and 2 more variables: total_fer &lt;dbl&gt;, gdpp &lt;dbl&gt;</code></pre>
+<pre class="r"><code>uncleanCP &lt;- CP %&gt;% pivot_longer(cols = Region:`Surface area (km2)`, 
+    names_to = &quot;Catagories&quot;, values_to = &quot;Value&quot;)  #messy CP
+uncleanCP %&gt;% pivot_wider(names_from = Catagories, values_from = Value)  #clean CP</code></pre>
+<pre><code>## # A tibble: 229 x 50
+##    country `Population in … `Population den… `Sex ratio (m p… `GDP: Gross dom…
+##    &lt;chr&gt;              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+##  1 Afghan…            35530             54.4            106.             20270
+##  2 Albania             2930            107.             102.             11541
+##  3 Algeria            41318             17.3            102             164779
+##  4 Americ…               56            278.             104.               -99
+##  5 Andorra               77            164.             102.              2812
+##  6 Angola             29784             23.9             96.2           117955
+##  7 Anguil…               15            166.              97.6              320
+##  8 Antigu…              102            232.              92.3             1356
+##  9 Argent…            44271             16.2             95.9           632343
+## 10 Armenia             2930            103.              88.8            10529
+## # … with 219 more rows, and 45 more variables: `GDP growth rate (annual %,
+## #   const. 2005 prices)` &lt;chr&gt;, `GDP per capita (current US$)` &lt;dbl&gt;, `Economy:
+## #   Agriculture (% of GVA)` &lt;chr&gt;, `Economy: Industry (% of GVA)` &lt;dbl&gt;,
+## #   `Economy: Services and other activity (% of GVA)` &lt;dbl&gt;, `Employment:
+## #   Agriculture (% of employed)` &lt;chr&gt;, `Employment: Industry (% of
+## #   employed)` &lt;chr&gt;, `Employment: Services (% of employed)` &lt;chr&gt;,
+## #   `Unemployment (% of labour force)` &lt;chr&gt;, `Labour force participation
+## #   (female/male pop. %)` &lt;chr&gt;, `Agricultural production index
+## #   (2004-2006=100)` &lt;dbl&gt;, `Food production index (2004-2006=100)` &lt;dbl&gt;,
+## #   `International trade: Exports (million US$)` &lt;chr&gt;, `International trade:
+## #   Imports (million US$)` &lt;chr&gt;, `International trade: Balance (million
+## #   US$)` &lt;chr&gt;, `Balance of payments, current account (million US$)` &lt;chr&gt;,
+## #   `Population growth rate (average annual %)` &lt;chr&gt;, `Urban population (% of
+## #   total population)` &lt;dbl&gt;, `Urban population growth rate (average annual
+## #   %)` &lt;chr&gt;, `Fertility rate, total (live births per woman)` &lt;chr&gt;, `Life
+## #   expectancy at birth (females/males, years)` &lt;chr&gt;, `Population age
+## #   distribution (0-14 / 60+ years, %)` &lt;chr&gt;, `International migrant stock
+## #   (000/% of total pop.)` &lt;chr&gt;, `Refugees and others of concern to UNHCR (in
+## #   thousands)` &lt;chr&gt;, `Infant mortality rate (per 1000 live births` &lt;chr&gt;,
+## #   `Health: Total expenditure (% of GDP)` &lt;dbl&gt;, `Health: Physicians (per 1000
+## #   pop.)` &lt;chr&gt;, `Education: Government expenditure (% of GDP)` &lt;chr&gt;,
+## #   `Education: Primary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Secondary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Tertiary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;, `Seats
+## #   held by women in national parliaments %` &lt;dbl&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...40` &lt;chr&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...41` &lt;chr&gt;, `Individuals using the
+## #   Internet (per 100 inhabitants)` &lt;dbl&gt;, `Threatened species (number)` &lt;chr&gt;,
+## #   `Forested area (% of land area)` &lt;chr&gt;, `CO2 emission estimates (million
+## #   tons/tons per capita)` &lt;dbl&gt;, `Energy production, primary
+## #   (Petajoules)` &lt;dbl&gt;, `Energy supply per capita (Gigajoules)` &lt;chr&gt;, `Pop.
+## #   using improved drinking water (urban/rural, %)` &lt;chr&gt;, `Pop. using improved
+## #   sanitation facilities (urban/rural, %)` &lt;chr&gt;, `Net Official Development
+## #   Assist. received (% of GNI)` &lt;dbl&gt;, Region &lt;chr&gt;, `Surface area
+## #   (km2)` &lt;chr&gt;</code></pre>
+<pre class="r"><code># ez money, but since these are back to being the same
+# datasets, I&#39;ll be using the og datasets for the rest of the
+# code</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><p>Join your 2+ separate data sources into a single dataset based on a common ID variable! If you can’t find a good pair datasets to join, you may split one main dataset into two different datasets with a common ID variable in each, and then join them back together based on that common ID, but this is obviously less than ideal.</p>
+<ul>
+<li>You will document the type of join that you do (left/right/inner/full), including a discussion of how many observations were in each dataset, which observations in each dataset were dropped (if any) and why you chose this particular join.</li>
+</ul></li>
+</ol>
+<pre class="r"><code>library(dplyr)
+totaldata1 &lt;- inner_join(CD, CP, by = &quot;country&quot;)
+
+
+# *In the original datasets, CD had 167 observations, while
+# CP had 229 observations. However in the joined datset there
+# is only 146 observations. This is because when the two
+# datasets were joined using inner_join observations were
+# dropped. Since the datasets were joined by country, the
+# dropped observations were countries. The observations that
+# were dropped were countries in each dataset that were not
+# in the other dataset. I specifically chose inner_join
+# because I only wanted to retain rows in both datasets, so I
+# could not use left/right join. I also wanted rows with all
+# values so I could not use full join either. This is why I
+# picked inner_join.</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li><p>Create summary statistics</p>
+<ul>
+<li><p>Use <em>all six</em> core <code>dplyr</code> functions (<code>filter, select, arrange, group_by, mutate, summarize</code>) to manipulate and explore your dataset. For mutate, create a new variable that is a function of at least one other variable, preferably using a dplyr vector function (see dplyr cheatsheet). It’s totally fine to use the <code>_if</code>, <code>_at</code>, <code>_all</code> versions of mutate/summarize instead (indeed, it is encouraged if you have lots of variables)</p></li>
+<li><p>Create summary statistics (<code>mean, sd, var, n, quantile, min, max, n_distinct, cor</code>, etc) for each of your numeric variables both overall and after grouping by one of your categorical variables (either together or one-at-a-time; if you have two categorical variables, try to include at least one statistic based on a grouping of two categorical variables simultaneously). If you do not have any categorical variables, create one using mutate (e.g., with <code>case_when</code> or <code>ifelse</code>) to satisfy the <code>group_by</code> requirements above. Ideally, you will find a way to show these summary statistics in an easy-to-read table (e.g., by reshaping). (You might explore the kable package for making pretty tables!) If you have lots of numeric variables (e.g., 10+), or your categorical variables have too many categories, just pick a few (either numeric variables or categories of a categorical variable) and summarize based on those. It would be a good idea to show a correlation matrix for your numeric variables (you will need it to make one of your plots).</p></li>
+</ul></li>
+</ol>
+<pre class="r"><code># filter
+filter(totaldata1, life_expec &gt; 70)</code></pre>
+<pre><code>## # A tibble: 88 x 59
+##    country child_mort exports health imports income inflation life_expec
+##    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Albania       16.6    28     6.55    48.6   9930     4.49        76.3
+##  2 Algeria       27.3    38.4   4.17    31.4  12900    16.1         76.5
+##  3 Antigu…       10.3    45.5   6.03    58.9  19100     1.44        76.8
+##  4 Argent…       14.5    18.9   8.1     16    18700    20.9         75.8
+##  5 Armenia       18.1    20.8   4.4     45.3   6700     7.77        73.3
+##  6 Austra…        4.8    19.8   8.73    20.9  41400     1.16        82  
+##  7 Austria        4.3    51.3  11       47.8  43200     0.873       80.5
+##  8 Bahamas       13.8    35     7.89    43.7  22900    -0.393       73.8
+##  9 Bahrain        8.6    69.5   4.97    50.9  41100     7.44        76  
+## 10 Bangla…       49.4    16     3.52    21.8   2440     7.14        70.4
+## # … with 78 more rows, and 51 more variables: total_fer &lt;dbl&gt;, gdpp &lt;dbl&gt;,
+## #   Region &lt;chr&gt;, `Surface area (km2)` &lt;chr&gt;, `Population in thousands
+## #   (2017)` &lt;dbl&gt;, `Population density (per km2, 2017)` &lt;dbl&gt;, `Sex ratio (m
+## #   per 100 f, 2017)` &lt;dbl&gt;, `GDP: Gross domestic product (million current
+## #   US$)` &lt;dbl&gt;, `GDP growth rate (annual %, const. 2005 prices)` &lt;chr&gt;, `GDP
+## #   per capita (current US$)` &lt;dbl&gt;, `Economy: Agriculture (% of GVA)` &lt;chr&gt;,
+## #   `Economy: Industry (% of GVA)` &lt;dbl&gt;, `Economy: Services and other activity
+## #   (% of GVA)` &lt;dbl&gt;, `Employment: Agriculture (% of employed)` &lt;chr&gt;,
+## #   `Employment: Industry (% of employed)` &lt;chr&gt;, `Employment: Services (% of
+## #   employed)` &lt;chr&gt;, `Unemployment (% of labour force)` &lt;chr&gt;, `Labour force
+## #   participation (female/male pop. %)` &lt;chr&gt;, `Agricultural production index
+## #   (2004-2006=100)` &lt;dbl&gt;, `Food production index (2004-2006=100)` &lt;dbl&gt;,
+## #   `International trade: Exports (million US$)` &lt;chr&gt;, `International trade:
+## #   Imports (million US$)` &lt;chr&gt;, `International trade: Balance (million
+## #   US$)` &lt;chr&gt;, `Balance of payments, current account (million US$)` &lt;chr&gt;,
+## #   `Population growth rate (average annual %)` &lt;chr&gt;, `Urban population (% of
+## #   total population)` &lt;dbl&gt;, `Urban population growth rate (average annual
+## #   %)` &lt;chr&gt;, `Fertility rate, total (live births per woman)` &lt;chr&gt;, `Life
+## #   expectancy at birth (females/males, years)` &lt;chr&gt;, `Population age
+## #   distribution (0-14 / 60+ years, %)` &lt;chr&gt;, `International migrant stock
+## #   (000/% of total pop.)` &lt;chr&gt;, `Refugees and others of concern to UNHCR (in
+## #   thousands)` &lt;chr&gt;, `Infant mortality rate (per 1000 live births` &lt;chr&gt;,
+## #   `Health: Total expenditure (% of GDP)` &lt;dbl&gt;, `Health: Physicians (per 1000
+## #   pop.)` &lt;chr&gt;, `Education: Government expenditure (% of GDP)` &lt;chr&gt;,
+## #   `Education: Primary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Secondary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Tertiary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;, `Seats
+## #   held by women in national parliaments %` &lt;dbl&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...40` &lt;chr&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...41` &lt;chr&gt;, `Individuals using the
+## #   Internet (per 100 inhabitants)` &lt;dbl&gt;, `Threatened species (number)` &lt;chr&gt;,
+## #   `Forested area (% of land area)` &lt;chr&gt;, `CO2 emission estimates (million
+## #   tons/tons per capita)` &lt;dbl&gt;, `Energy production, primary
+## #   (Petajoules)` &lt;dbl&gt;, `Energy supply per capita (Gigajoules)` &lt;chr&gt;, `Pop.
+## #   using improved drinking water (urban/rural, %)` &lt;chr&gt;, `Pop. using improved
+## #   sanitation facilities (urban/rural, %)` &lt;chr&gt;, `Net Official Development
+## #   Assist. received (% of GNI)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code>names(totaldata1)[18] &lt;- &quot;GDP_per_capita&quot;
+filter(totaldata1, life_expec &gt; 70 &amp; GDP_per_capita &gt; 5000)</code></pre>
+<pre><code>## # A tibble: 69 x 59
+##    country child_mort exports health imports income inflation life_expec
+##    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Antigu…       10.3    45.5   6.03    58.9  19100     1.44        76.8
+##  2 Argent…       14.5    18.9   8.1     16    18700    20.9         75.8
+##  3 Austra…        4.8    19.8   8.73    20.9  41400     1.16        82  
+##  4 Austria        4.3    51.3  11       47.8  43200     0.873       80.5
+##  5 Bahamas       13.8    35     7.89    43.7  22900    -0.393       73.8
+##  6 Bahrain        8.6    69.5   4.97    50.9  41100     7.44        76  
+##  7 Barbad…       14.2    39.5   7.97    48.7  15300     0.321       76.7
+##  8 Belarus        5.5    51.4   5.61    64.5  16200    15.1         70.4
+##  9 Belgium        4.5    76.4  10.7     74.7  41100     1.88        80  
+## 10 Brazil        19.8    10.7   9.01    11.8  14500     8.41        74.2
+## # … with 59 more rows, and 51 more variables: total_fer &lt;dbl&gt;, gdpp &lt;dbl&gt;,
+## #   Region &lt;chr&gt;, `Surface area (km2)` &lt;chr&gt;, `Population in thousands
+## #   (2017)` &lt;dbl&gt;, `Population density (per km2, 2017)` &lt;dbl&gt;, `Sex ratio (m
+## #   per 100 f, 2017)` &lt;dbl&gt;, `GDP: Gross domestic product (million current
+## #   US$)` &lt;dbl&gt;, `GDP growth rate (annual %, const. 2005 prices)` &lt;chr&gt;,
+## #   GDP_per_capita &lt;dbl&gt;, `Economy: Agriculture (% of GVA)` &lt;chr&gt;, `Economy:
+## #   Industry (% of GVA)` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)` &lt;dbl&gt;, `Employment: Agriculture (% of employed)` &lt;chr&gt;, `Employment:
+## #   Industry (% of employed)` &lt;chr&gt;, `Employment: Services (% of
+## #   employed)` &lt;chr&gt;, `Unemployment (% of labour force)` &lt;chr&gt;, `Labour force
+## #   participation (female/male pop. %)` &lt;chr&gt;, `Agricultural production index
+## #   (2004-2006=100)` &lt;dbl&gt;, `Food production index (2004-2006=100)` &lt;dbl&gt;,
+## #   `International trade: Exports (million US$)` &lt;chr&gt;, `International trade:
+## #   Imports (million US$)` &lt;chr&gt;, `International trade: Balance (million
+## #   US$)` &lt;chr&gt;, `Balance of payments, current account (million US$)` &lt;chr&gt;,
+## #   `Population growth rate (average annual %)` &lt;chr&gt;, `Urban population (% of
+## #   total population)` &lt;dbl&gt;, `Urban population growth rate (average annual
+## #   %)` &lt;chr&gt;, `Fertility rate, total (live births per woman)` &lt;chr&gt;, `Life
+## #   expectancy at birth (females/males, years)` &lt;chr&gt;, `Population age
+## #   distribution (0-14 / 60+ years, %)` &lt;chr&gt;, `International migrant stock
+## #   (000/% of total pop.)` &lt;chr&gt;, `Refugees and others of concern to UNHCR (in
+## #   thousands)` &lt;chr&gt;, `Infant mortality rate (per 1000 live births` &lt;chr&gt;,
+## #   `Health: Total expenditure (% of GDP)` &lt;dbl&gt;, `Health: Physicians (per 1000
+## #   pop.)` &lt;chr&gt;, `Education: Government expenditure (% of GDP)` &lt;chr&gt;,
+## #   `Education: Primary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Secondary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Tertiary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;, `Seats
+## #   held by women in national parliaments %` &lt;dbl&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...40` &lt;chr&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...41` &lt;chr&gt;, `Individuals using the
+## #   Internet (per 100 inhabitants)` &lt;dbl&gt;, `Threatened species (number)` &lt;chr&gt;,
+## #   `Forested area (% of land area)` &lt;chr&gt;, `CO2 emission estimates (million
+## #   tons/tons per capita)` &lt;dbl&gt;, `Energy production, primary
+## #   (Petajoules)` &lt;dbl&gt;, `Energy supply per capita (Gigajoules)` &lt;chr&gt;, `Pop.
+## #   using improved drinking water (urban/rural, %)` &lt;chr&gt;, `Pop. using improved
+## #   sanitation facilities (urban/rural, %)` &lt;chr&gt;, `Net Official Development
+## #   Assist. received (% of GNI)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code># select
+select(totaldata1, 1, 8, 15, 18, 48)</code></pre>
+<pre><code>## # A tibble: 146 x 5
+##    country    life_expec `Sex ratio (m per… GDP_per_capita `Seats held by women…
+##    &lt;chr&gt;           &lt;dbl&gt;              &lt;dbl&gt;          &lt;dbl&gt;                 &lt;dbl&gt;
+##  1 Afghanist…       56.2              106.            623.                  27.7
+##  2 Albania          76.3              102.           3984.                  22.9
+##  3 Algeria          76.5              102            4154.                  31.6
+##  4 Angola           60.1               96.2          4714.                  38.2
+##  5 Antigua a…       76.8               92.3         14764.                  11.1
+##  6 Argentina        75.8               95.9         14564.                  38.9
+##  7 Armenia          73.3               88.8          3489.                   9.9
+##  8 Australia        82                 99.3         51352.                  28.7
+##  9 Austria          80.5               96.2         44118.                  30.6
+## 10 Azerbaijan       69.1               99.3          5439.                  16.8
+## # … with 136 more rows</code></pre>
+<pre class="r"><code># arange
+arrange(totaldata1, desc(GDP_per_capita))</code></pre>
+<pre><code>## # A tibble: 146 x 59
+##    country child_mort exports health imports income inflation life_expec
+##    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Luxemb…        2.8   175     7.77   142    91700     3.62        81.3
+##  2 Switze…        4.5    64    11.5     53.3  55500     0.317       82.2
+##  3 Norway         3.2    39.7   9.48    28.5  62300     5.95        81  
+##  4 Qatar          9      62.3   1.81    23.8 125000     6.98        79.5
+##  5 Ireland        4.2   103     9.19    86.5  45700    -3.22        80.4
+##  6 Denmark        4.1    50.5  11.4     43.6  44000     3.22        79.5
+##  7 Singap…        2.8   200     3.96   174    72100    -0.046       82.7
+##  8 Austra…        4.8    19.8   8.73    20.9  41400     1.16        82  
+##  9 Iceland        2.6    53.4   9.4     43.3  38800     5.47        82  
+## 10 Sweden         3      46.2   9.63    40.7  42900     0.991       81.5
+## # … with 136 more rows, and 51 more variables: total_fer &lt;dbl&gt;, gdpp &lt;dbl&gt;,
+## #   Region &lt;chr&gt;, `Surface area (km2)` &lt;chr&gt;, `Population in thousands
+## #   (2017)` &lt;dbl&gt;, `Population density (per km2, 2017)` &lt;dbl&gt;, `Sex ratio (m
+## #   per 100 f, 2017)` &lt;dbl&gt;, `GDP: Gross domestic product (million current
+## #   US$)` &lt;dbl&gt;, `GDP growth rate (annual %, const. 2005 prices)` &lt;chr&gt;,
+## #   GDP_per_capita &lt;dbl&gt;, `Economy: Agriculture (% of GVA)` &lt;chr&gt;, `Economy:
+## #   Industry (% of GVA)` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)` &lt;dbl&gt;, `Employment: Agriculture (% of employed)` &lt;chr&gt;, `Employment:
+## #   Industry (% of employed)` &lt;chr&gt;, `Employment: Services (% of
+## #   employed)` &lt;chr&gt;, `Unemployment (% of labour force)` &lt;chr&gt;, `Labour force
+## #   participation (female/male pop. %)` &lt;chr&gt;, `Agricultural production index
+## #   (2004-2006=100)` &lt;dbl&gt;, `Food production index (2004-2006=100)` &lt;dbl&gt;,
+## #   `International trade: Exports (million US$)` &lt;chr&gt;, `International trade:
+## #   Imports (million US$)` &lt;chr&gt;, `International trade: Balance (million
+## #   US$)` &lt;chr&gt;, `Balance of payments, current account (million US$)` &lt;chr&gt;,
+## #   `Population growth rate (average annual %)` &lt;chr&gt;, `Urban population (% of
+## #   total population)` &lt;dbl&gt;, `Urban population growth rate (average annual
+## #   %)` &lt;chr&gt;, `Fertility rate, total (live births per woman)` &lt;chr&gt;, `Life
+## #   expectancy at birth (females/males, years)` &lt;chr&gt;, `Population age
+## #   distribution (0-14 / 60+ years, %)` &lt;chr&gt;, `International migrant stock
+## #   (000/% of total pop.)` &lt;chr&gt;, `Refugees and others of concern to UNHCR (in
+## #   thousands)` &lt;chr&gt;, `Infant mortality rate (per 1000 live births` &lt;chr&gt;,
+## #   `Health: Total expenditure (% of GDP)` &lt;dbl&gt;, `Health: Physicians (per 1000
+## #   pop.)` &lt;chr&gt;, `Education: Government expenditure (% of GDP)` &lt;chr&gt;,
+## #   `Education: Primary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Secondary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Tertiary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;, `Seats
+## #   held by women in national parliaments %` &lt;dbl&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...40` &lt;chr&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...41` &lt;chr&gt;, `Individuals using the
+## #   Internet (per 100 inhabitants)` &lt;dbl&gt;, `Threatened species (number)` &lt;chr&gt;,
+## #   `Forested area (% of land area)` &lt;chr&gt;, `CO2 emission estimates (million
+## #   tons/tons per capita)` &lt;dbl&gt;, `Energy production, primary
+## #   (Petajoules)` &lt;dbl&gt;, `Energy supply per capita (Gigajoules)` &lt;chr&gt;, `Pop.
+## #   using improved drinking water (urban/rural, %)` &lt;chr&gt;, `Pop. using improved
+## #   sanitation facilities (urban/rural, %)` &lt;chr&gt;, `Net Official Development
+## #   Assist. received (% of GNI)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code># group_by
+totaldata1 %&gt;% group_by(Region) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 22 x 2
+##    Region         `n()`
+##    &lt;chr&gt;          &lt;int&gt;
+##  1 Caribbean          7
+##  2 CentralAmerica     5
+##  3 CentralAsia        4
+##  4 EasternAfrica     12
+##  5 EasternAsia        3
+##  6 EasternEurope      6
+##  7 Melanesia          3
+##  8 Micronesia         1
+##  9 MiddleAfrica       6
+## 10 NorthernAfrica     6
+## # … with 12 more rows</code></pre>
+<pre class="r"><code># mutate
+totaldata1 %&gt;% mutate(exports_per_imports = exports/imports)</code></pre>
+<pre><code>## # A tibble: 146 x 60
+##    country child_mort exports health imports income inflation life_expec
+##    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Afghan…       90.2    10     7.58    44.9   1610     9.44        56.2
+##  2 Albania       16.6    28     6.55    48.6   9930     4.49        76.3
+##  3 Algeria       27.3    38.4   4.17    31.4  12900    16.1         76.5
+##  4 Angola       119      62.3   2.85    42.9   5900    22.4         60.1
+##  5 Antigu…       10.3    45.5   6.03    58.9  19100     1.44        76.8
+##  6 Argent…       14.5    18.9   8.1     16    18700    20.9         75.8
+##  7 Armenia       18.1    20.8   4.4     45.3   6700     7.77        73.3
+##  8 Austra…        4.8    19.8   8.73    20.9  41400     1.16        82  
+##  9 Austria        4.3    51.3  11       47.8  43200     0.873       80.5
+## 10 Azerba…       39.2    54.3   5.88    20.7  16000    13.8         69.1
+## # … with 136 more rows, and 52 more variables: total_fer &lt;dbl&gt;, gdpp &lt;dbl&gt;,
+## #   Region &lt;chr&gt;, `Surface area (km2)` &lt;chr&gt;, `Population in thousands
+## #   (2017)` &lt;dbl&gt;, `Population density (per km2, 2017)` &lt;dbl&gt;, `Sex ratio (m
+## #   per 100 f, 2017)` &lt;dbl&gt;, `GDP: Gross domestic product (million current
+## #   US$)` &lt;dbl&gt;, `GDP growth rate (annual %, const. 2005 prices)` &lt;chr&gt;,
+## #   GDP_per_capita &lt;dbl&gt;, `Economy: Agriculture (% of GVA)` &lt;chr&gt;, `Economy:
+## #   Industry (% of GVA)` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)` &lt;dbl&gt;, `Employment: Agriculture (% of employed)` &lt;chr&gt;, `Employment:
+## #   Industry (% of employed)` &lt;chr&gt;, `Employment: Services (% of
+## #   employed)` &lt;chr&gt;, `Unemployment (% of labour force)` &lt;chr&gt;, `Labour force
+## #   participation (female/male pop. %)` &lt;chr&gt;, `Agricultural production index
+## #   (2004-2006=100)` &lt;dbl&gt;, `Food production index (2004-2006=100)` &lt;dbl&gt;,
+## #   `International trade: Exports (million US$)` &lt;chr&gt;, `International trade:
+## #   Imports (million US$)` &lt;chr&gt;, `International trade: Balance (million
+## #   US$)` &lt;chr&gt;, `Balance of payments, current account (million US$)` &lt;chr&gt;,
+## #   `Population growth rate (average annual %)` &lt;chr&gt;, `Urban population (% of
+## #   total population)` &lt;dbl&gt;, `Urban population growth rate (average annual
+## #   %)` &lt;chr&gt;, `Fertility rate, total (live births per woman)` &lt;chr&gt;, `Life
+## #   expectancy at birth (females/males, years)` &lt;chr&gt;, `Population age
+## #   distribution (0-14 / 60+ years, %)` &lt;chr&gt;, `International migrant stock
+## #   (000/% of total pop.)` &lt;chr&gt;, `Refugees and others of concern to UNHCR (in
+## #   thousands)` &lt;chr&gt;, `Infant mortality rate (per 1000 live births` &lt;chr&gt;,
+## #   `Health: Total expenditure (% of GDP)` &lt;dbl&gt;, `Health: Physicians (per 1000
+## #   pop.)` &lt;chr&gt;, `Education: Government expenditure (% of GDP)` &lt;chr&gt;,
+## #   `Education: Primary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Secondary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Tertiary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;, `Seats
+## #   held by women in national parliaments %` &lt;dbl&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...40` &lt;chr&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...41` &lt;chr&gt;, `Individuals using the
+## #   Internet (per 100 inhabitants)` &lt;dbl&gt;, `Threatened species (number)` &lt;chr&gt;,
+## #   `Forested area (% of land area)` &lt;chr&gt;, `CO2 emission estimates (million
+## #   tons/tons per capita)` &lt;dbl&gt;, `Energy production, primary
+## #   (Petajoules)` &lt;dbl&gt;, `Energy supply per capita (Gigajoules)` &lt;chr&gt;, `Pop.
+## #   using improved drinking water (urban/rural, %)` &lt;chr&gt;, `Pop. using improved
+## #   sanitation facilities (urban/rural, %)` &lt;chr&gt;, `Net Official Development
+## #   Assist. received (% of GNI)` &lt;dbl&gt;, exports_per_imports &lt;dbl&gt;</code></pre>
+<pre class="r"><code># summarize
+totaldata1 %&gt;% summarize_all(funs(mean))</code></pre>
+<pre><code>## # A tibble: 1 x 59
+##   country child_mort exports health imports income inflation life_expec
+##     &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1      NA       38.7    40.8   6.80    46.5 17333.      7.43       70.6
+## # … with 51 more variables: total_fer &lt;dbl&gt;, gdpp &lt;dbl&gt;, Region &lt;dbl&gt;, `Surface
+## #   area (km2)` &lt;dbl&gt;, `Population in thousands (2017)` &lt;dbl&gt;, `Population
+## #   density (per km2, 2017)` &lt;dbl&gt;, `Sex ratio (m per 100 f, 2017)` &lt;dbl&gt;,
+## #   `GDP: Gross domestic product (million current US$)` &lt;dbl&gt;, `GDP growth rate
+## #   (annual %, const. 2005 prices)` &lt;dbl&gt;, GDP_per_capita &lt;dbl&gt;, `Economy:
+## #   Agriculture (% of GVA)` &lt;dbl&gt;, `Economy: Industry (% of GVA)` &lt;dbl&gt;,
+## #   `Economy: Services and other activity (% of GVA)` &lt;dbl&gt;, `Employment:
+## #   Agriculture (% of employed)` &lt;dbl&gt;, `Employment: Industry (% of
+## #   employed)` &lt;dbl&gt;, `Employment: Services (% of employed)` &lt;dbl&gt;,
+## #   `Unemployment (% of labour force)` &lt;dbl&gt;, `Labour force participation
+## #   (female/male pop. %)` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)` &lt;dbl&gt;, `Food production index (2004-2006=100)` &lt;dbl&gt;,
+## #   `International trade: Exports (million US$)` &lt;dbl&gt;, `International trade:
+## #   Imports (million US$)` &lt;dbl&gt;, `International trade: Balance (million
+## #   US$)` &lt;dbl&gt;, `Balance of payments, current account (million US$)` &lt;dbl&gt;,
+## #   `Population growth rate (average annual %)` &lt;dbl&gt;, `Urban population (% of
+## #   total population)` &lt;dbl&gt;, `Urban population growth rate (average annual
+## #   %)` &lt;dbl&gt;, `Fertility rate, total (live births per woman)` &lt;dbl&gt;, `Life
+## #   expectancy at birth (females/males, years)` &lt;dbl&gt;, `Population age
+## #   distribution (0-14 / 60+ years, %)` &lt;dbl&gt;, `International migrant stock
+## #   (000/% of total pop.)` &lt;dbl&gt;, `Refugees and others of concern to UNHCR (in
+## #   thousands)` &lt;dbl&gt;, `Infant mortality rate (per 1000 live births` &lt;dbl&gt;,
+## #   `Health: Total expenditure (% of GDP)` &lt;dbl&gt;, `Health: Physicians (per 1000
+## #   pop.)` &lt;dbl&gt;, `Education: Government expenditure (% of GDP)` &lt;dbl&gt;,
+## #   `Education: Primary gross enrol. ratio (f/m per 100 pop.)` &lt;dbl&gt;,
+## #   `Education: Secondary gross enrol. ratio (f/m per 100 pop.)` &lt;dbl&gt;,
+## #   `Education: Tertiary gross enrol. ratio (f/m per 100 pop.)` &lt;dbl&gt;, `Seats
+## #   held by women in national parliaments %` &lt;dbl&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...40` &lt;dbl&gt;, `Mobile-cellular
+## #   subscriptions (per 100 inhabitants)...41` &lt;dbl&gt;, `Individuals using the
+## #   Internet (per 100 inhabitants)` &lt;dbl&gt;, `Threatened species (number)` &lt;dbl&gt;,
+## #   `Forested area (% of land area)` &lt;dbl&gt;, `CO2 emission estimates (million
+## #   tons/tons per capita)` &lt;dbl&gt;, `Energy production, primary
+## #   (Petajoules)` &lt;dbl&gt;, `Energy supply per capita (Gigajoules)` &lt;dbl&gt;, `Pop.
+## #   using improved drinking water (urban/rural, %)` &lt;dbl&gt;, `Pop. using improved
+## #   sanitation facilities (urban/rural, %)` &lt;dbl&gt;, `Net Official Development
+## #   Assist. received (% of GNI)` &lt;dbl&gt;</code></pre>
+<pre class="r"><code># summary stats Before grouping by categorical (&#39;overall&#39;)
+totaldata1 %&gt;% group_by() %&gt;% summarise(across(.cols = is.numeric, 
+    .fns = list(Mean = mean, SD = sd, Min = min, Max = max, Sum = sum), 
+    na.rm = TRUE, .names = &quot;{col}_{fn}&quot;))</code></pre>
+<pre><code>## # A tibble: 1 x 125
+##   child_mort_Mean child_mort_SD child_mort_Min child_mort_Max child_mort_Sum
+##             &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;
+## 1            38.7          41.2            2.6            208          5656.
+## # … with 120 more variables: exports_Mean &lt;dbl&gt;, exports_SD &lt;dbl&gt;,
+## #   exports_Min &lt;dbl&gt;, exports_Max &lt;dbl&gt;, exports_Sum &lt;dbl&gt;, health_Mean &lt;dbl&gt;,
+## #   health_SD &lt;dbl&gt;, health_Min &lt;dbl&gt;, health_Max &lt;dbl&gt;, health_Sum &lt;dbl&gt;,
+## #   imports_Mean &lt;dbl&gt;, imports_SD &lt;dbl&gt;, imports_Min &lt;dbl&gt;, imports_Max &lt;dbl&gt;,
+## #   imports_Sum &lt;dbl&gt;, income_Mean &lt;dbl&gt;, income_SD &lt;dbl&gt;, income_Min &lt;dbl&gt;,
+## #   income_Max &lt;dbl&gt;, income_Sum &lt;dbl&gt;, inflation_Mean &lt;dbl&gt;,
+## #   inflation_SD &lt;dbl&gt;, inflation_Min &lt;dbl&gt;, inflation_Max &lt;dbl&gt;,
+## #   inflation_Sum &lt;dbl&gt;, life_expec_Mean &lt;dbl&gt;, life_expec_SD &lt;dbl&gt;,
+## #   life_expec_Min &lt;dbl&gt;, life_expec_Max &lt;dbl&gt;, life_expec_Sum &lt;dbl&gt;,
+## #   total_fer_Mean &lt;dbl&gt;, total_fer_SD &lt;dbl&gt;, total_fer_Min &lt;dbl&gt;,
+## #   total_fer_Max &lt;dbl&gt;, total_fer_Sum &lt;dbl&gt;, gdpp_Mean &lt;dbl&gt;, gdpp_SD &lt;dbl&gt;,
+## #   gdpp_Min &lt;dbl&gt;, gdpp_Max &lt;dbl&gt;, gdpp_Sum &lt;dbl&gt;, `Population in thousands
+## #   (2017)_Mean` &lt;dbl&gt;, `Population in thousands (2017)_SD` &lt;dbl&gt;, `Population
+## #   in thousands (2017)_Min` &lt;dbl&gt;, `Population in thousands (2017)_Max` &lt;dbl&gt;,
+## #   `Population in thousands (2017)_Sum` &lt;dbl&gt;, `Population density (per km2,
+## #   2017)_Mean` &lt;dbl&gt;, `Population density (per km2, 2017)_SD` &lt;dbl&gt;,
+## #   `Population density (per km2, 2017)_Min` &lt;dbl&gt;, `Population density (per
+## #   km2, 2017)_Max` &lt;dbl&gt;, `Population density (per km2, 2017)_Sum` &lt;dbl&gt;, `Sex
+## #   ratio (m per 100 f, 2017)_Mean` &lt;dbl&gt;, `Sex ratio (m per 100 f,
+## #   2017)_SD` &lt;dbl&gt;, `Sex ratio (m per 100 f, 2017)_Min` &lt;dbl&gt;, `Sex ratio (m
+## #   per 100 f, 2017)_Max` &lt;dbl&gt;, `Sex ratio (m per 100 f, 2017)_Sum` &lt;dbl&gt;,
+## #   `GDP: Gross domestic product (million current US$)_Mean` &lt;dbl&gt;, `GDP: Gross
+## #   domestic product (million current US$)_SD` &lt;dbl&gt;, `GDP: Gross domestic
+## #   product (million current US$)_Min` &lt;dbl&gt;, `GDP: Gross domestic product
+## #   (million current US$)_Max` &lt;dbl&gt;, `GDP: Gross domestic product (million
+## #   current US$)_Sum` &lt;dbl&gt;, GDP_per_capita_Mean &lt;dbl&gt;,
+## #   GDP_per_capita_SD &lt;dbl&gt;, GDP_per_capita_Min &lt;dbl&gt;,
+## #   GDP_per_capita_Max &lt;dbl&gt;, GDP_per_capita_Sum &lt;dbl&gt;, `Economy: Industry (%
+## #   of GVA)_Mean` &lt;dbl&gt;, `Economy: Industry (% of GVA)_SD` &lt;dbl&gt;, `Economy:
+## #   Industry (% of GVA)_Min` &lt;dbl&gt;, `Economy: Industry (% of GVA)_Max` &lt;dbl&gt;,
+## #   `Economy: Industry (% of GVA)_Sum` &lt;dbl&gt;, `Economy: Services and other
+## #   activity (% of GVA)_Mean` &lt;dbl&gt;, `Economy: Services and other activity (%
+## #   of GVA)_SD` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)_Min` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)_Max` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)_Sum` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_Mean` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_SD` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_Min` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_Max` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_Sum` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_Mean` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_SD` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_Min` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_Max` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_Sum` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_Mean` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_SD` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_Min` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_Max` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_Sum` &lt;dbl&gt;, `Health: Total expenditure (% of GDP)_Mean` &lt;dbl&gt;,
+## #   `Health: Total expenditure (% of GDP)_SD` &lt;dbl&gt;, `Health: Total expenditure
+## #   (% of GDP)_Min` &lt;dbl&gt;, `Health: Total expenditure (% of GDP)_Max` &lt;dbl&gt;,
+## #   `Health: Total expenditure (% of GDP)_Sum` &lt;dbl&gt;, `Seats held by women in
+## #   national parliaments %_Mean` &lt;dbl&gt;, `Seats held by women in national
+## #   parliaments %_SD` &lt;dbl&gt;, `Seats held by women in national parliaments
+## #   %_Min` &lt;dbl&gt;, `Seats held by women in national parliaments %_Max` &lt;dbl&gt;,
+## #   `Seats held by women in national parliaments %_Sum` &lt;dbl&gt;, …</code></pre>
+<pre class="r"><code># After grouping by categorical
+totaldata1 %&gt;% group_by(Region) %&gt;% summarise(across(.cols = is.numeric, 
+    .fns = list(Mean = mean, SD = sd, Min = min, Max = max, Sum = sum), 
+    na.rm = TRUE, .names = &quot;{col}_{fn}&quot;))</code></pre>
+<pre><code>## # A tibble: 22 x 126
+##    Region child_mort_Mean child_mort_SD child_mort_Min child_mort_Max
+##    &lt;chr&gt;            &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;
+##  1 Carib…           44.8          72.4            10.3          208  
+##  2 Centr…           20.7           9.13           10.2           35.4
+##  3 Centr…           43.0          17.9            21.5           62  
+##  4 Easte…           67.5          28.6            14.4          101  
+##  5 Easte…           15            11.5             3.2           26.1
+##  6 Easte…            8.58          3.03            5.5           11.7
+##  7 Melan…           27.1           2.68           24.1           29.2
+##  8 Micro…           62.7          NA              62.7           62.7
+##  9 Middl…          117.           31.9            63.7          150  
+## 10 North…           33.4          22.2            16.6           76.7
+## # … with 12 more rows, and 121 more variables: child_mort_Sum &lt;dbl&gt;,
+## #   exports_Mean &lt;dbl&gt;, exports_SD &lt;dbl&gt;, exports_Min &lt;dbl&gt;, exports_Max &lt;dbl&gt;,
+## #   exports_Sum &lt;dbl&gt;, health_Mean &lt;dbl&gt;, health_SD &lt;dbl&gt;, health_Min &lt;dbl&gt;,
+## #   health_Max &lt;dbl&gt;, health_Sum &lt;dbl&gt;, imports_Mean &lt;dbl&gt;, imports_SD &lt;dbl&gt;,
+## #   imports_Min &lt;dbl&gt;, imports_Max &lt;dbl&gt;, imports_Sum &lt;dbl&gt;, income_Mean &lt;dbl&gt;,
+## #   income_SD &lt;dbl&gt;, income_Min &lt;dbl&gt;, income_Max &lt;dbl&gt;, income_Sum &lt;dbl&gt;,
+## #   inflation_Mean &lt;dbl&gt;, inflation_SD &lt;dbl&gt;, inflation_Min &lt;dbl&gt;,
+## #   inflation_Max &lt;dbl&gt;, inflation_Sum &lt;dbl&gt;, life_expec_Mean &lt;dbl&gt;,
+## #   life_expec_SD &lt;dbl&gt;, life_expec_Min &lt;dbl&gt;, life_expec_Max &lt;dbl&gt;,
+## #   life_expec_Sum &lt;dbl&gt;, total_fer_Mean &lt;dbl&gt;, total_fer_SD &lt;dbl&gt;,
+## #   total_fer_Min &lt;dbl&gt;, total_fer_Max &lt;dbl&gt;, total_fer_Sum &lt;dbl&gt;,
+## #   gdpp_Mean &lt;dbl&gt;, gdpp_SD &lt;dbl&gt;, gdpp_Min &lt;dbl&gt;, gdpp_Max &lt;dbl&gt;,
+## #   gdpp_Sum &lt;dbl&gt;, `Population in thousands (2017)_Mean` &lt;dbl&gt;, `Population in
+## #   thousands (2017)_SD` &lt;dbl&gt;, `Population in thousands (2017)_Min` &lt;dbl&gt;,
+## #   `Population in thousands (2017)_Max` &lt;dbl&gt;, `Population in thousands
+## #   (2017)_Sum` &lt;dbl&gt;, `Population density (per km2, 2017)_Mean` &lt;dbl&gt;,
+## #   `Population density (per km2, 2017)_SD` &lt;dbl&gt;, `Population density (per
+## #   km2, 2017)_Min` &lt;dbl&gt;, `Population density (per km2, 2017)_Max` &lt;dbl&gt;,
+## #   `Population density (per km2, 2017)_Sum` &lt;dbl&gt;, `Sex ratio (m per 100 f,
+## #   2017)_Mean` &lt;dbl&gt;, `Sex ratio (m per 100 f, 2017)_SD` &lt;dbl&gt;, `Sex ratio (m
+## #   per 100 f, 2017)_Min` &lt;dbl&gt;, `Sex ratio (m per 100 f, 2017)_Max` &lt;dbl&gt;,
+## #   `Sex ratio (m per 100 f, 2017)_Sum` &lt;dbl&gt;, `GDP: Gross domestic product
+## #   (million current US$)_Mean` &lt;dbl&gt;, `GDP: Gross domestic product (million
+## #   current US$)_SD` &lt;dbl&gt;, `GDP: Gross domestic product (million current
+## #   US$)_Min` &lt;dbl&gt;, `GDP: Gross domestic product (million current
+## #   US$)_Max` &lt;dbl&gt;, `GDP: Gross domestic product (million current
+## #   US$)_Sum` &lt;dbl&gt;, GDP_per_capita_Mean &lt;dbl&gt;, GDP_per_capita_SD &lt;dbl&gt;,
+## #   GDP_per_capita_Min &lt;dbl&gt;, GDP_per_capita_Max &lt;dbl&gt;,
+## #   GDP_per_capita_Sum &lt;dbl&gt;, `Economy: Industry (% of GVA)_Mean` &lt;dbl&gt;,
+## #   `Economy: Industry (% of GVA)_SD` &lt;dbl&gt;, `Economy: Industry (% of
+## #   GVA)_Min` &lt;dbl&gt;, `Economy: Industry (% of GVA)_Max` &lt;dbl&gt;, `Economy:
+## #   Industry (% of GVA)_Sum` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)_Mean` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)_SD` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)_Min` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)_Max` &lt;dbl&gt;, `Economy: Services and other activity (% of
+## #   GVA)_Sum` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_Mean` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_SD` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_Min` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_Max` &lt;dbl&gt;, `Agricultural production index
+## #   (2004-2006=100)_Sum` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_Mean` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_SD` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_Min` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_Max` &lt;dbl&gt;, `Food production index
+## #   (2004-2006=100)_Sum` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_Mean` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_SD` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_Min` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_Max` &lt;dbl&gt;, `Urban population (% of total
+## #   population)_Sum` &lt;dbl&gt;, `Health: Total expenditure (% of GDP)_Mean` &lt;dbl&gt;,
+## #   `Health: Total expenditure (% of GDP)_SD` &lt;dbl&gt;, `Health: Total expenditure
+## #   (% of GDP)_Min` &lt;dbl&gt;, `Health: Total expenditure (% of GDP)_Max` &lt;dbl&gt;,
+## #   `Health: Total expenditure (% of GDP)_Sum` &lt;dbl&gt;, `Seats held by women in
+## #   national parliaments %_Mean` &lt;dbl&gt;, `Seats held by women in national
+## #   parliaments %_SD` &lt;dbl&gt;, `Seats held by women in national parliaments
+## #   %_Min` &lt;dbl&gt;, `Seats held by women in national parliaments %_Max` &lt;dbl&gt;, …</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li><p>Make visualizations (three plots)</p>
+<ul>
+<li>Make a correlation heatmap of your numeric variables</li>
+<li>Create at least two additional plots of your choice with ggplot that highlight some of the more interesting features of your data.</li>
+<li>Each plot (besides the heatmap) should have at least three variables mapped to separate aesthetics</li>
+<li>Each should use different geoms (e.g., don’t do two geom_bars)</li>
+<li>At least one plot should include <code>stat="summary"</code></li>
+<li>Each plot should include a supporting paragraph describing the relationships that are being visualized and any trends that are apparent
+<ul>
+<li>It is fine to include more, but limit yourself to 4. Plots should avoid being redundant! Four bad plots will get a lower grade than two good plots, all else being equal.</li>
+</ul></li>
+<li>Make them pretty! Use correct labels, etc.</li>
+</ul></li>
+</ol>
+<pre class="r"><code># Correlation Matrix:
+
+# colnames(totaldata1) #I use this periodically to help
+# rename the column rows to make it easier to insert in
+# functions
+totaldata1 &lt;- subset(totaldata1, select = -c(59))  #removing column
+
+cormat &lt;- totaldata1 %&gt;% select_if(is.numeric) %&gt;% cor(use = &quot;pair&quot;)
+library(tidyverse)
+tidycormat &lt;- cormat %&gt;% as.data.frame %&gt;% rownames_to_column(&quot;var1&quot;) %&gt;% 
+    pivot_longer(-1, names_to = &quot;var2&quot;, values_to = &quot;correlation&quot;)
+
+# Heatmap:
+
+totaldata1 %&gt;% select_if(is.numeric) %&gt;% cor %&gt;% as.data.frame %&gt;% 
+    rownames_to_column %&gt;% pivot_longer(-1) %&gt;% ggplot(aes(rowname, 
+    name, fill = value)) + geom_tile() + geom_text(aes(label = round(value, 
+    2)), position = position_dodge(width = 0.5), size = 0) + 
+    xlab(&quot;&quot;) + ylab(&quot;&quot;) + theme(axis.text.x = element_text(angle = 90, 
+    hjust = 1))</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Plot One &amp; Analysis Paragraph: Jitter, Country&#39;s GDP, Life Expectancy, &amp; Sex Ratio
+
+names(totaldata1)[15] &lt;- &quot;Sex_ratio&quot;
+
+ggplot(data = totaldata1, aes(x= GDP_per_capita, y = life_expec, color = Sex_ratio &gt;100)) + geom_jitter() + labs(x = &quot;GDP Per Capita&quot;, y = &quot;Life Expectancy&quot;, title = &quot;Country&#39;s GDP, Life Expectancy, &amp; Sex Ratio&quot;, color = &quot;Men pop. &gt; women pop.&quot;, labels = c(&quot;&gt; 90&quot;, &quot;&lt; 90&quot;)) + theme(axis.text.x = element_text(angle = 90, hjust=1)) + theme(legend.title = element_text(colour=&quot;blue&quot;, size=10, face=&quot;bold&quot;))+                              # coloring the grouping variable
+  stat_summary(fun.y = &quot;mean&quot;, geom = &quot;point&quot;) +        # adding data points
+  stat_summary(fun.y = &quot;mean&quot;, geom = &quot;line&quot;) +         # adding connecting lines
+  stat_summary(fun.data = &quot;mean_se&quot;, geom = &quot;errorbar&quot;) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +  # add more tick marks
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10))</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>    #In this plot there were three main variables being plotted, a country&#39;s GDP (Gross Domestic Product in millions, US dollars) compared to life expectancy and the if the population of men was larger. I chose these three choices because I wanted to see if there was a correlation between any of them, since the wealthier a nation is the better, I assume, their healthcare might be. This was shown clearly as there is a logarithmic-like curve between life expectancy and GDP. However the sex ratio variable showed no clear correlation with GPD but populations with more men (per 100 females counted) did seem to have a higher life expectancy than populations with more women. This is really interesting because globally women live longer than men, so I would have assumed populations with more women would tend to have a higher average life expectancy. However the data based of this graph is not conclusive enough to come to any assumption.</code></pre>
+<pre class="r"><code># Plot Two &amp; Analysis Paragraph: Jitter, Countries GDP, Life
+# Expectancy, &amp; Sex Ratio
+names(totaldata1)[48] &lt;- &quot;Women_in_Parliment&quot;
+names(totaldata1)[36] &lt;- &quot;Fertility_rate&quot;
+names(totaldata1)[25] &lt;- &quot;Unemployment&quot;
+
+fr &lt;- totaldata1$Fertility_rate &gt; 2.4
+totaldata1_mod &lt;- totaldata1
+
+# Dividing by facets, the TRUE indicates Unemployment &gt; 4
+
+ggplot(totaldata1_mod, aes(x = Women_in_Parliment, fill = fr)) + 
+    geom_histogram(position = &quot;identity&quot;, alpha = 0.4) + facet_grid(Unemployment &gt; 
+    4 ~ .) + labs(x = &quot;Women In Parliment&quot;, title = &quot;Country&#39;s Women in Parliment, Fertility Rate, &amp; Unemployment&quot;, 
+    fill = &quot; Fertility Rate &gt;2.4&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># In this plot they were three main variables being plotted,
+# the percent of women in parliament, the fertility rate of
+# the country, and the unemployment percent. I chose these
+# three variables because I wanted to see if there was a
+# correlation between any of the three. I had assumed that
+# the higher the percentage of women in Parliament would mean
+# that there was a lower fertility rate, because that would
+# mean that more women are getting an education, and the more
+# women that get an education would be likely to hold off on
+# having children- if they decide on having children at all.
+# I also chose unemployment as a factor, because I assumed
+# there would be a correlation with more women in Parliament
+# (subsequently getting an education) meaning less people in
+# unemployment. I also assume that the less unemployment
+# there is the lower the fertility rate because most people
+# would be too busy working to take care of children. However
+# the statistics show little to no correlation between the
+# fertility rate and women in Parliament; there was also
+# little to no correlation between unemployment and women in
+# Parliament. Lastly there was also little to no correlation
+# between unemployment and fertility rate. Although this data
+# is not enough to make any final assumptions, there was no
+# evidence to show that there would be any correlation with
+# further research.</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li><p>Perform k-means/PAM clustering or PCA on (at least) your numeric variables.</p>
+<ul>
+<li><p>Include all steps as we discuss in class, including a visualization.</p></li>
+<li><p>If you don’t have at least 3 numeric variables, or you want to cluster based on categorical variables too, convert them to factors in R, generate Gower’s dissimilarity matrix on the data, and do PAM clustering on the dissimilarities.</p></li>
+<li><p>Show how you chose the final number of clusters/principal components</p></li>
+<li><p>Interpret the final clusters/principal components</p></li>
+<li><p>For every step, document what your code does (in words) and what you see in the data!</p></li>
+</ul></li>
+</ol>
+<pre class="r"><code># Dimensionality Reduction
+
+# turning my variables into numeric
+totaldata1$Women_in_Parliment = as.numeric(as.factor(totaldata1$Women_in_Parliment))
+totaldata1$Sex_ratio = as.numeric(as.factor(totaldata1$Sex_ratio))
+totaldata1$Fertility_rate = as.numeric(as.factor(totaldata1$Fertility_rate))
+
+nonadata &lt;- totaldata1 %&gt;% na.omit() %&gt;% select(&quot;Women_in_Parliment&quot;, 
+    &quot;Sex_ratio&quot;, &quot;Fertility_rate&quot;)  #omiting NAs 
+
+library(cluster)
+sil_width &lt;- vector()  #empty vector to hold mean sil width
+for (i in 2:10) {
+    kms &lt;- kmeans(nonadata, centers = i)  #compute k-means solution  
+    sil &lt;- silhouette(kms$cluster, dist(nonadata))  #get sil widths
+    sil_width[i] &lt;- mean(sil[, 3])  #take averages (higher is better)
+}
+ggplot() + geom_line(aes(x = 1:10, y = sil_width)) + scale_x_continuous(name = &quot;k&quot;, 
+    breaks = 1:10)  #Silhouette width</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>kmeans1 &lt;- nonadata %&gt;% scale %&gt;% kmeans(3)  #set number of clusters k
+kmeans1</code></pre>
+<pre><code>## K-means clustering with 3 clusters of sizes 41, 55, 50
+## 
+## Cluster means:
+##   Women_in_Parliment  Sex_ratio Fertility_rate
+## 1         -0.5538547 -0.7671644     -0.6899476
+## 2         -0.5717713  0.8367422      0.8248463
+## 3          1.0831093 -0.2913416     -0.3415739
+## 
+## Clustering vector:
+##   [1] 2 3 3 3 1 3 1 3 3 1 1 2 2 1 3 3 1 2 2 1 1 1 1 2 3 1 2 3 2 2 1 3 1 2 3 1 1
+##  [38] 3 3 3 2 3 2 2 1 2 3 3 2 2 1 3 2 1 3 1 2 2 3 1 1 3 2 2 2 3 3 3 1 1 2 3 2 2
+##  [75] 2 1 1 3 2 2 1 3 2 2 2 2 2 1 2 1 1 1 1 3 1 3 3 3 3 2
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 46 entries ]
+## 
+## Within cluster sum of squares by cluster:
+## [1]  41.01432 101.34939  73.76937
+##  (between_SS / total_SS =  50.3 %)
+## 
+## Available components:
+## 
+## [1] &quot;cluster&quot;      &quot;centers&quot;      &quot;totss&quot;        &quot;withinss&quot;     &quot;tot.withinss&quot;
+## [6] &quot;betweenss&quot;    &quot;size&quot;         &quot;iter&quot;         &quot;ifault&quot;</code></pre>
+<pre class="r"><code>kmeansclust &lt;- nonadata %&gt;% mutate(cluster = as.factor(kmeans1$cluster))  #saving cluster assignment as a column in your dataset
+kmeansclust %&gt;% ggplot(aes(Women_in_Parliment, Sex_ratio, Fertility_rate, 
+    color = Fertility_rate)) + geom_point() + labs(x = &quot;Women In Parliment&quot;, 
+    y = &quot;Sex Ratio (Men per 100 Women)&quot;, title = &quot;Country&#39;s Women in Parliment, Fertility Rate, &amp; Sex Ratio&quot;)  #Plotting of data colored by 3rd variable</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># clust_dat1 &lt;- disnet1 %&gt;%
+# dplyr::select(Women_in_Parliment,Sex_ratio,Fertility_rate)
+# kmeans3 &lt;-clust_dat1 %&gt;%kmeans(3)
+
+
+kmeansclust &lt;- nonadata %&gt;% as.data.frame() %&gt;% mutate(cluster = as.factor(kmeans1$cluster))
+library(GGally)
+ggpairs(kmeansclust, columns = 1:3, aes(color = cluster), upper = NULL)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-14-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># In this plot they were three main variables being plotted,
+# the percent of women in parliament, the fertility rate of
+# the country, and the sex ratio (men per 100 women).
+# Although there was no strong correlation to be seen there
+# were some interesting light trends that could be
+# interpreted. One of the trends is that the less men there
+# were compared to women, the more women would be in
+# Parliament. It&#39;s quite interesting because in many women
+# population dominated countries there still majority of men
+# in politics, however this slight trend shows that there is
+# a higher percentage of women in parliament when there are
+# less men (per 100 women). Another interesting thing I found
+# was that fertility rate its lowest in areas where there
+# were very little men per hundred women; in fact the
+# fertility rate did not increase over 20% in areas where
+# there was 25% or less sex ratio. But the opposing is not
+# true, in areas where there was plenty of men the fertility
+# rate was still not very high. The highest fertility rate
+# happened, surprisingly, where the sex ratio was
+# about/around 50%. Lastly, the fertility rate and percent of
+# women in parliament had no visible trend, it was very
+# sporadic. I do believe variant could have been a huge
+# factor in this data considering we don&#39;t know how accurate
+# this data is or by what means it was collected. Although no
+# assumptions can be made based off this data alone, there
+# are some trends that would be interesting to explore in the
+# future.</code></pre>
+<P style="page-break-before: always">
+<div style="page-break-after: always;"></div>
+</div>
+<div id="rubric" class="section level3">
+<h3>Rubric</h3>
+<p>Prerequisite: Finding appropriate data from at least two sources per the instructions above: Failure to do this will result in a 0! You will submit a .Rmd file and a knitted document (html/pdf).</p>
+<div id="introduction-5-pts" class="section level4">
+<h4>0. Introduction (5 pts)</h4>
+<ul>
+<li>Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.</li>
+</ul>
+</div>
+<div id="tidying-rearranging-widelong-10-pts" class="section level4">
+<h4>1. Tidying: Rearranging Wide/Long (10 pts)</h4>
+<ul>
+<li>Tidy the datasets (using the <code>tidyr</code> functions <code>pivot_longer</code>/<code>gather</code> and/or <code>pivot_wider</code>/<code>spread</code>)</li>
+<li>If you data sets are already tidy, be sure to use those functions somewhere else in your project (e.g., for rearranging summary statistics)</li>
+<li>Document the process (describe in words what was done)</li>
+</ul>
+</div>
+<div id="joiningmerging-10-pts" class="section level4">
+<h4>2. Joining/Merging (10 pts)</h4>
+<ul>
+<li>Join your datasets into one using a <code>dplyr</code> join function</li>
+<li>If you have multiple observations on the joining variable in either dataset, fix this by collapsing via summarize</li>
+<li>Discuss the process in words, including why you chose the join you did</li>
+<li>Discuss which cases were dropped, if any, and potential problems with this</li>
+</ul>
+</div>
+<div id="wrangling-40-pts" class="section level4">
+<h4>3. Wrangling (40 pts)</h4>
+<ul>
+<li>Use all six core <code>dplyr</code> functions in the service of generating summary tables/statistics (12 pts)
+<ul>
+<li>Use mutate at least once to generate a variable that is a function of at least one other variable</li>
+</ul></li>
+<li>Compute summary statistics for each of your variables using <code>summarize</code> alone and with <code>group_by</code> (if you have more than 10 variables, fine to just focus on 10) (20 pts)
+<ul>
+<li>Use at least 5 unique functions inside of summarize (e.g., mean, sd)</li>
+<li>For at least 2, use summarize after grouping by a categorical variable. Create one by dichotomizing a numeric if necessary</li>
+<li>If applicable, at least 1 of these should group by two categorical variables</li>
+</ul></li>
+<li>Summarize the procedure and discuss all (or the most interesting) results in no more than two paragraphs (8 pts)</li>
+</ul>
+</div>
+<div id="visualizing-30-pts" class="section level4">
+<h4>4. Visualizing (30 pts)</h4>
+<ul>
+<li><p>Create a correlation heatmap of your numeric variables the way we did in class</p></li>
+<li><p>Create two more effective, polished plots with ggplot</p>
+<ul>
+<li>Each plot should map 3+ variables to aesthetics</li>
+<li>Each plot should have a title and clean labeling for all mappings</li>
+<li>Change at least one default theme element and color for at least one mapping per plot</li>
+<li>For at least one plot, add more tick marks (x, y, or both) than are given by default</li>
+<li>For at least one plot, use the stat=“summary” function</li>
+<li>Supporting paragraph or two (for each plot) describing the relationships/trends that are apparent</li>
+</ul></li>
+</ul>
+</div>
+<div id="dimensionality-reduction-30-pts" class="section level4">
+<h4>5. Dimensionality Reduction (30 pts)</h4>
+<ul>
+<li><p>Either k-means/PAM clustering or PCA (inclusive “or”) should be performed on at least three of your variables (3 is just the minimum: using more/all of them will make this much more interesting!)</p>
+<ul>
+<li>All relevant steps discussed in class (e.g., picking number of PCs/clusters)</li>
+<li>A visualization of the clusters or the first few principal components (using ggplot2)</li>
+<li>Supporting paragraph or two describing results found, interpreting the clusters/PCs in terms of the original variables and observations, discussing goodness of fit or variance explained, etc.</li>
+</ul></li>
+</ul>
+</div>
+<div id="neatness-holisticdiscretionary-points-5-pts" class="section level4">
+<h4>6. Neatness, Holistic/Discretionary Points (5 pts)</h4>
+<ul>
+<li>Keep things looking nice! Your project should not knit to more than 30 or so pages (probably closer to 10-20)! You will lose points if you print out your entire dataset(s), have terrible formatting, etc. If you start your project in a fresh .Rmd file, you are advised to copy set-up code below and include it: this will do things like automatically truncate if you accidentally print out a huge dataset, etc. Imagine this is a polished report you are giving to your PI or boss to summarize your work researching a topic.</li>
+</ul>
+<pre class="r"><code>## paste this chunk into the ```{r setup} chunk at the top of
+## your project 1 .Rmd file
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = &quot;center&quot;, 
+    warning = F, message = F, tidy = TRUE, tidy.opts = list(width.cutoff = 60), 
+    R.options = list(max.print = 100))</code></pre>
+<pre class="r"><code># cortd &lt;-
+totaldata1</code></pre>
+<pre><code>## # A tibble: 146 x 58
+##    country child_mort exports health imports income inflation life_expec
+##    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Afghan…       90.2    10     7.58    44.9   1610     9.44        56.2
+##  2 Albania       16.6    28     6.55    48.6   9930     4.49        76.3
+##  3 Algeria       27.3    38.4   4.17    31.4  12900    16.1         76.5
+##  4 Angola       119      62.3   2.85    42.9   5900    22.4         60.1
+##  5 Antigu…       10.3    45.5   6.03    58.9  19100     1.44        76.8
+##  6 Argent…       14.5    18.9   8.1     16    18700    20.9         75.8
+##  7 Armenia       18.1    20.8   4.4     45.3   6700     7.77        73.3
+##  8 Austra…        4.8    19.8   8.73    20.9  41400     1.16        82  
+##  9 Austria        4.3    51.3  11       47.8  43200     0.873       80.5
+## 10 Azerba…       39.2    54.3   5.88    20.7  16000    13.8         69.1
+## # … with 136 more rows, and 50 more variables: total_fer &lt;dbl&gt;, gdpp &lt;dbl&gt;,
+## #   Region &lt;chr&gt;, `Surface area (km2)` &lt;chr&gt;, `Population in thousands
+## #   (2017)` &lt;dbl&gt;, `Population density (per km2, 2017)` &lt;dbl&gt;, Sex_ratio &lt;dbl&gt;,
+## #   `GDP: Gross domestic product (million current US$)` &lt;dbl&gt;, `GDP growth rate
+## #   (annual %, const. 2005 prices)` &lt;chr&gt;, GDP_per_capita &lt;dbl&gt;, `Economy:
+## #   Agriculture (% of GVA)` &lt;chr&gt;, `Economy: Industry (% of GVA)` &lt;dbl&gt;,
+## #   `Economy: Services and other activity (% of GVA)` &lt;dbl&gt;, `Employment:
+## #   Agriculture (% of employed)` &lt;chr&gt;, `Employment: Industry (% of
+## #   employed)` &lt;chr&gt;, `Employment: Services (% of employed)` &lt;chr&gt;,
+## #   Unemployment &lt;chr&gt;, `Labour force participation (female/male pop.
+## #   %)` &lt;chr&gt;, `Agricultural production index (2004-2006=100)` &lt;dbl&gt;, `Food
+## #   production index (2004-2006=100)` &lt;dbl&gt;, `International trade: Exports
+## #   (million US$)` &lt;chr&gt;, `International trade: Imports (million US$)` &lt;chr&gt;,
+## #   `International trade: Balance (million US$)` &lt;chr&gt;, `Balance of payments,
+## #   current account (million US$)` &lt;chr&gt;, `Population growth rate (average
+## #   annual %)` &lt;chr&gt;, `Urban population (% of total population)` &lt;dbl&gt;, `Urban
+## #   population growth rate (average annual %)` &lt;chr&gt;, Fertility_rate &lt;dbl&gt;,
+## #   `Life expectancy at birth (females/males, years)` &lt;chr&gt;, `Population age
+## #   distribution (0-14 / 60+ years, %)` &lt;chr&gt;, `International migrant stock
+## #   (000/% of total pop.)` &lt;chr&gt;, `Refugees and others of concern to UNHCR (in
+## #   thousands)` &lt;chr&gt;, `Infant mortality rate (per 1000 live births` &lt;chr&gt;,
+## #   `Health: Total expenditure (% of GDP)` &lt;dbl&gt;, `Health: Physicians (per 1000
+## #   pop.)` &lt;chr&gt;, `Education: Government expenditure (% of GDP)` &lt;chr&gt;,
+## #   `Education: Primary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Secondary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   `Education: Tertiary gross enrol. ratio (f/m per 100 pop.)` &lt;chr&gt;,
+## #   Women_in_Parliment &lt;dbl&gt;, `Mobile-cellular subscriptions (per 100
+## #   inhabitants)...40` &lt;chr&gt;, `Mobile-cellular subscriptions (per 100
+## #   inhabitants)...41` &lt;chr&gt;, `Individuals using the Internet (per 100
+## #   inhabitants)` &lt;dbl&gt;, `Threatened species (number)` &lt;chr&gt;, `Forested area (%
+## #   of land area)` &lt;chr&gt;, `CO2 emission estimates (million tons/tons per
+## #   capita)` &lt;dbl&gt;, `Energy production, primary (Petajoules)` &lt;dbl&gt;, `Energy
+## #   supply per capita (Gigajoules)` &lt;chr&gt;, `Pop. using improved drinking water
+## #   (urban/rural, %)` &lt;chr&gt;, `Pop. using improved sanitation facilities
+## #   (urban/rural, %)` &lt;chr&gt;</code></pre>
+</div>
+</div>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
