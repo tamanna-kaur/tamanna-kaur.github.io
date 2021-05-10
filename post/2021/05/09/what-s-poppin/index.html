@@ -7,7 +7,7 @@
     <meta name="author" content="Tamanna Kaur" />
     
     <link rel="shortcut icon" type="image/x-icon" href="../../../../../img/favicon.ico">
-    <title>What&#39;s poppin&#39;?</title>
+    <title>Rosetta Stone for R and Python</title>
     <meta name="generator" content="Hugo 0.83.1" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="../../../../../css/main.css" />
@@ -54,7 +54,7 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="../../../../../post/2021/05/09/what-s-poppin/">What&#39;s poppin&#39;?</a></strong>
+            <strong><a href="../../../../../post/2021/05/09/what-s-poppin/">Rosetta Stone for R and Python</a></strong>
           </h3>
         </div>
  
@@ -72,7 +72,36 @@
               
 
 
-<p>Hola amigos! Welcome to my life!</p>
+<p>Let’s talk about R and Python! Some background information based completely off what I know/remember:</p>
+<p>Python is one of the most user friendly coding languages that exist, it was actually named after the movie monty python and the holy grail (hilarious movie, 10/10 recommend). Also made fairly recently, 1990s I believe (#90skids).</p>
+<p>R is for really for science nerds. Like myself and probably you, since you’re reading a R-coded website right now :) But it is also pretty neat if I say so myself. Made more recently than Python, I think the 2010s, which is probably why it’s also pretty user friendly.</p>
+<p>Now that you’re graced with knowledge you probably already knew, let’s get into something called Reticulate and a fun example of it.</p>
+<p>Reticulate to me is basically like Google translate for R and Python. The way it works is that when using reticulate, the two languages are communicating through translation, R data converts to python data types so be read by Python, and then once the values are retreived they are converted from Python back to R data.</p>
+<p>It’s kinda cool, so here’s a simple example of it to solidify that explanation:</p>
+<pre class="r"><code>#R language chunk
+library(reticulate)
+one&lt;-&quot;Thank you&quot;</code></pre>
+<p>This chunk focused on calling the package reticulate (our version of the rosetta stone), and initializing the word one to hold the string of words “Thank you”</p>
+<pre class="python"><code>#Python language chunk
+two=&quot;for reading this :)&quot;
+print(r.one,two) </code></pre>
+<pre><code>## Thank you for reading this :)</code></pre>
+<p>This chunk of code switched into python, and coded the word two as a string of words saying “for reading this :)”</p>
+<p>Then it called python’s print function (because it is a python chunk so we code in that langauge) to print r.one (meaning the variable we established in r in the chunck above), and two (which is python’s variable so it does not need to be established in it’s own chunk).</p>
+<pre class="r"><code>##R language chunk
+cat(c(one, py$two)) </code></pre>
+<pre><code>## Thank you for reading this :)</code></pre>
+<p>Now to show you the opposite way, in R’s chunk we called one normally, but we wrote py$two to call the variable made in python. Neat right??</p>
+<p>Here are some examples of how it would not work:</p>
+<pre class="r"><code>#R example of what would NOT work:
+
+#cat(c(one, two)) </code></pre>
+<p>If we tried to call the variable two, which was made in python, without using “py$” the code would not run, you would receive an error message. This is because we are in the R code chunk and we are calling for a variable that does not exist in R, only in python.</p>
+<p>Vise Versa:</p>
+<pre class="python"><code>#Python example of what would NOT work:
+
+#print(one,two) </code></pre>
+<p>If we tried to call the variable one, which was made in R, without using “r.” the code would not run, you would receive an error message. This is because we are in the python code chunk and we are calling for a variable that does not exist in python, only in R.</p>
 <p><a href="../../../../../project/project1/">Link to project 1</a></p>
 <p><a href="https://www.google.com">Link to google</a></p>
 

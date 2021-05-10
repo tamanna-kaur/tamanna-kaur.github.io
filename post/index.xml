@@ -8,14 +8,14 @@
     <language>en-US</language>
     <lastBuildDate>Sun, 09 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>What&#39;s poppin&#39;?</title>
+      <title>Rosetta Stone for R and Python</title>
       <link>/post/2021/05/09/what-s-poppin/</link>
       <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
       
       <guid>/post/2021/05/09/what-s-poppin/</guid>
-      <description>Hola amigos! Welcome to my life!
-Link to project 1
-Link to google</description>
+      <description>Let’s talk about R and Python! Some background information based completely off what I know/remember:
+Python is one of the most user friendly coding languages that exist, it was actually named after the movie monty python and the holy grail (hilarious movie, 10/10 recommend). Also made fairly recently, 1990s I believe (#90skids).
+R is for really for science nerds. Like myself and probably you, since you’re reading a R-coded website right now :) But it is also pretty neat if I say so myself.</description>
     </item>
     
   </channel>

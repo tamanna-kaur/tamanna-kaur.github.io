@@ -1,5 +1,5 @@
 ---
-title: What's poppin'?
+title: Rosetta Stone for R and Python
 author: ''
 date: '2021-05-09'
 slug: what-s-poppin
@@ -8,8 +8,68 @@ tags: []
 description: ''
 ---
 
-Hola amigos! Welcome to my life!
+Let's talk about R and Python! Some background information based completely off what I know/remember:
 
+Python is one of the most user friendly coding languages that exist, it was actually named after the movie monty python and the holy grail (hilarious movie, 10/10 recommend). Also made fairly recently, 1990s I believe (#90skids).
+
+R is for really for science nerds. Like myself and probably you, since you're reading a R-coded website right now :) But it is also pretty neat if I say so myself. Made more recently than Python, I think the 2010s, which is probably why it's also pretty user friendly.
+
+
+Now that you're graced with knowledge you probably already knew, let's get into something called Reticulate and a fun example of it.
+
+Reticulate to me is basically like Google translate for R and Python. The way it works is that when using reticulate, the two languages are communicating through translation, R data converts to python data types so be read by Python, and then once the values are retreived they are converted from Python back to R data.
+
+It's kinda cool, so here's a simple example of it to solidify that explanation:
+
+
+
+
+```{R}
+#R language chunk
+library(reticulate)
+one<-"Thank you"
+```
+This chunk focused on calling the package reticulate (our version of the rosetta stone), and initializing the word one to hold the string of words "Thank you"
+
+```{python}
+#Python language chunk
+two="for reading this :)"
+print(r.one,two) 
+```
+This chunk of code switched into python, and coded the word two as a string of words saying "for reading this :)"
+
+Then it called python's print function (because it is a python chunk so we code in that langauge) to print r.one (meaning the variable we established in r in the chunck above), and two (which is python's variable so it does not need to be established in it's own chunk).
+
+
+```{R}
+##R language chunk
+cat(c(one, py$two)) 
+```
+Now to show you the opposite way, in R's chunk we called one normally, but we wrote py$two to call the variable made in python. Neat right??
+
+Here are some examples of how it would not work:
+
+```{R}
+#R example of what would NOT work:
+
+#cat(c(one, two)) 
+```
+
+If we tried to call the variable two, which was made in python, without using "py$" the code would not run, you would receive an error message. This is because we are in the R code chunk and we are calling for a variable that does not exist in R, only in python.
+
+Vise Versa:
+
+```{python}
+#Python example of what would NOT work:
+
+#print(one,two) 
+```
+
+If we tried to call the variable one, which was made in R, without using "r." the code would not run, you would receive an error message. This is because we are in the python code chunk and we are calling for a variable that does not exist in python, only in R.
+
+
+
+ 
 [Link to project 1](/project/project1/)
 
 [Link to google](https://www.google.com)
