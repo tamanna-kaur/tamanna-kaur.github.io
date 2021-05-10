@@ -4,7 +4,7 @@ html, body {
   background-color: #fff;
   font-family: 'Source Sans Pro', sans-serif;
   /* The html and body elements cannot have any padding or margin. */
-  border-top: 2px solid #f8971f;
+  border-top: 5px solid #3398FF;
 }
 
 /* Wrapper for page content to push down footer */
@@ -27,7 +27,7 @@ html, body {
   border-color: #ffffff;
 }
 .navbar-default .navbar-brand {
-  color: #6b6b6b;
+  color: #3398FF;
 }
 .navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
   color: #6b6b6b;
@@ -50,7 +50,7 @@ html, body {
   background-color: #ffffff;
 }
 .navbar-default .navbar-toggle {
-  border-color: #ffffff;
+  border-color: #3398FF;
 }
 .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
   background-color: #ffffff;
@@ -60,7 +60,7 @@ html, body {
 }
 .navbar-default .navbar-collapse,
 .navbar-default .navbar-form {
-  border-color: #6b6b6b;
+  border-color: #3398FF;
 }
 .navbar-default .navbar-link {
   color: #6b6b6b;
@@ -189,7 +189,7 @@ html, body {
 	color: #6b6b6b;
 }
 div.footer{
-  border-bottom: 5px solid #f8971f;;
+  border-bottom: 5px solid #3398FF;;
 }
 /* Set the fixed height of the footer here */
 /*.footer {
